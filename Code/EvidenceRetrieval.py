@@ -19,18 +19,19 @@ retrieve top relevant articles
 
 """
 import argparse, logging
-from newspaper import fulltext
 import requests, time, os
 import numpy as np
 import pandas as pd
-from transformers import AutoTokenizer, AutoModel, PegasusTokenizer, PegasusForConditionalGeneration
-from sentence_transformers import util
-from pygooglenews import GoogleNews
-from spacy.lang.en import English
-from pprint import pprint
 import validators
 import torch
+from pprint import pprint
+from newspaper import fulltext
+from spacy.lang.en import English
+from pygooglenews import GoogleNews
+from sentence_transformers import util
 from celery.exceptions import SoftTimeLimitExceeded
+from transformers import AutoTokenizer, AutoModel, PegasusTokenizer, PegasusForConditionalGeneration
+
 from QueryImage import *
 
 # Params

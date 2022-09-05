@@ -28,10 +28,15 @@ from pyfiglet import Figlet
 from newspaper import fulltext
 from spacy.lang.en import English
 from celery.exceptions import SoftTimeLimitExceeded
+import torch.nn as nn
+from torchinfo import summary
+from transformers import BertTokenizer, AutoModel
+
 from text_processing import *
 from QueryImage import *
 from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
+from VBInference import vb_inference
 
 warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -54,6 +59,44 @@ num_class = 3
 sequence_length = 128
 # Aggregating method: top, max, mean, concat, att, sum
 graph_pool = 'att'
+
+
+class Classifier(nn.Module):
+    
+    def __init__(self, dropout=0.5):
+
+        super(Classifier, self).__init__()
+
+        self.model = AutoModel.from_pretrained('uclanlp/visualbert-nlvr2-coco-pre')
+        self.dropout = nn.Dropout(dropout)
+        self.fc1 = nn.Linear(768, 512)
+        self.fc2 = nn.Linear(512,256)
+        self.fc3 = nn.Linear(256,1)
+        self.relu = nn.ReLU()
+        self.softmax =nn.LogSoftmax(dim=1)
+
+    def forward(self, input_ids, attention_mask, token_type_ids, visual_embeds,visual_attention_mask, visual_token_type_ids):
+
+        # _, pooled_output = self.bert(input_ids= input_id, attention_mask=mask,return_dict=False)
+        for param in self.model.parameters():
+            param.requires_grad = False
+        
+        output = self.model(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids, visual_embeds=visual_embeds, visual_attention_mask=visual_attention_mask, visual_token_type_ids=visual_token_type_ids,output_hidden_states=True)
+        # print(f"output hidden state tensor: {output.last_hidden_state}")
+        # print(f"output hidden state shape:{output.last_hidden_state.shape}")
+        # cls_hs = self.vbert(sent_id, attention_mask=mask)[0][:,0]         ### TO MODIFY AGAIN ####
+        x = self.fc1(output.last_hidden_state)
+        x = self.relu(x)
+        x = self.dropout(x)
+        
+        x = self.fc2(x)
+        x = self.relu(x)
+        x = self.dropout(x)
+        
+        x = self.fc3(x)
+        x = self.softmax(x)
+        
+        return x
 
 
 def executePipeline(query, input_image, surebot_logger):
@@ -101,6 +144,7 @@ def executePipeline(query, input_image, surebot_logger):
         for token in myDoc:
             sentenceToken.append(token.text)
 
+        vb_outcome = vb_inference(input_image, querytext)
 
         print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
         surebot_logger.info(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
@@ -128,8 +172,8 @@ def executePipeline(query, input_image, surebot_logger):
         surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
 
         output_message = "===== FACT CHECK RESULTS ====="
-        output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
-        output_message += "\nQuery Input: {}".format(query)
+        #output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
+        #output_message += "\nQuery Input: {}".format(query)
 
         if len(Filtered_Articles) == 0:
             output_message += '\n\nNO MATCHING ARTICLES FOUND. NOT ENOUGH EVIDENCE!'
@@ -184,14 +228,15 @@ def executePipeline(query, input_image, surebot_logger):
                 output_message += '\n' + Filtered_Articles[i][2] + '\n*[Summary]* '
                 for j in range(len(Filtered_Articles[i][1])):
                     output_message += Filtered_Articles[i][1][j]
+
     except Exception as e:
         if isinstance(e, SoftTimeLimitExceeded):
             raise
         else:
             output_message = 'Exception occurred in pipeline'
             print(e)
-
-    return output_message    #, final_score, len(Filtered_Articles)
+    
+    return output_message, vb_outcome    #, final_score, len(Filtered_Articles)
 
 
 def remove_emoji(text):
@@ -295,7 +340,7 @@ if __name__ == "__main__":
             input_claim = ''
         print(f'\n\nProcessing your claim......', file_name)
         surebot_logger.info(input_claim)
-        result = executePipeline(input_claim, img_filepath, surebot_logger)
-        #result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
-        #df_results.loc[i] = [df.loc[i]['filename'], df.loc[i]['ocr_text'], final_score, articles]
-        print('Result is: ' + result)
+        result, vb_result = executePipeline(input_claim, img_filepath, surebot_logger)
+        result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
+        print('Reverse Image Search Results :', result)
+        print('Visual Bert Comparison Results :', vb_result)

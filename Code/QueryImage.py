@@ -4,7 +4,6 @@ import pandas as pd
 from glob import glob
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
-#from summarizer_pegasus import summarise_text
 from text_processing import *
 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -23,7 +22,6 @@ class QueryImage(object):
     def detect_web(self, path):
         """Detects web annotations given an image."""
 
-        #client = vision_v1.ImageAnnotatorClient()   
         with io.open(path, 'rb') as image_file:
             content = image_file.read()
 
@@ -33,8 +31,6 @@ class QueryImage(object):
 
         full_matching_images = []
         matching_images = []
-        #partial_matching_images = []
-        #visually_similar_images = []
         
         if annotations.full_matching_images:
             for page in annotations.full_matching_images:
@@ -96,10 +92,6 @@ class QueryImage(object):
         except:
             return []
 
-        #with open(output_file, "w", encoding='utf-8') as f:
-        #    f.writelines(text)
-        #f.close()
-
 
     def get_whitelist(self, whitelist):
 
@@ -120,6 +112,7 @@ class QueryImage(object):
                 handler.write(img_data)
         except(ConnectionError, HTTPError, ConnectTimeout):
             return None
+
 
 def reverse_image_search(select_file):
 
@@ -174,15 +167,9 @@ def main(select_file):
             clean_title = process_title(item.page_title)
             print('clean_title :', clean_title)
             text = query_image.extract_text_from_html(html_text, item.url)
-            #print('extract_text :', text)
             clean_text = process_text(text, domain)
-            
-            #summary = summarise_text(clean_text)
-            #link_info['summary'] = summary
-            #matching_links.append([link_info])
+
             print('clean text :', clean_text)
-            #print('number of words :', len(clean_text.split()))        
-            #print('summary :', summary)
             print('\n')
             count += 1
         #else:
@@ -198,7 +185,6 @@ def main(select_file):
             #clean_text = process_text(text)
     
 
-0
 if __name__ == "__main__":
 
     picture_folder = "D:/Capstone/surebot/images"
@@ -212,155 +198,3 @@ if __name__ == "__main__":
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         results = reverse_image_search(select_file)
-        #main(select_file)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-'''
-
-# The script below processes all the images in the folder
-regex = '^(?:https?:\\/\\/)?(?:[^@\\/\\n]+@)?(?:www\\.)?([^:\\/\\n]+)'
-filepath = "D:/Capstone/webscraping"
-files = glob(os.path.join(filepath, 'images/*.*'))
-whitelist = get_whitelist()
-locations = []
-df = pd.DataFrame(columns=['filename', 'ocr_text', 'word_count', 'summary'])
-
-for num, file in enumerate(files[0:50]):
-    location = []
-    full_matching_url = []
-    matching_image_url = []
-    matching_title = [] 
-    summary = ''
-    
-    ocr_text = detect_text(file)
- 
-    print(num,' ', file)
-    file_name = file.split('\\')[-1]
-    if ocr_text == []:
-        ocr_text = 'None'
-        word_count = 0
-    else:
-        word_count = len(ocr_text[0].split())        
-    
-    if ocr_text == 'None':
-        summary = 'None'
-    else:
-        summary = summarise_text(ocr_text[0])
-        
-    df.loc[num] = [file_name, ocr_text[0], word_count, summary]
-    
-df.to_excel('ocr_text_220818_model2.xlsx') 
-
-# In[5]
-# The script below processes all the images in the folder
-regex = '^(?:https?:\\/\\/)?(?:[^@\\/\\n]+@)?(?:www\\.)?([^:\\/\\n]+)'
-pwd = "D:/Capstone/webscraping"
-temp_image = 'image_name.jpg'
-html_text = 'html_text.txt'
-files = glob(os.path.join(pwd, 'images_fake/*.*'))
-whitelist = get_whitelist()
-locations = []
-df = pd.DataFrame(columns=['filename', 'full_matching_url', 'matching_url', 'matching_title', 'ocr_text', 'summary'])
-
-for num, file in enumerate(files):
-    location = []
-    full_matching_url = []
-    matching_image_url = []
-    matching_title = []
-    summary = ''
-    
-    ocr_text = detect_text(file)
-    
-    file_name = file.split('\\')[-1]
-    full, match = detect_web(file)
-
-    if full:
-        for i, item in enumerate(full):         
-            full_matching_url.append(item.url)
-            try:
-                get_image_from_web(item.url)
-                if detect_landmarks_local(temp_image) != []:
-                    locations.append(detect_landmarks_loca, mathl(temp_image))
-            except:
-                continue
-    location.append(locations[0:1])
-    
-    # This is the best match to use to scrap for any information
-    
-    if match:
-
-        for i, item in enumerate(match):
-            domain = re.findall(regex, item.url)[0]  
-            matching_image_url.append(item.url+'\n')
-            clean_title = process_title(item.page_title)
-            matching_title.append(clean_title+'\n')
-            
-            if domain in whitelist:
-                text = extract_text_from_html(html_text, item.url)
-                clean_text = process_text(text)
-
-                if domain == 'blackdotresearch.sg':
-                    clean_text = process_text_blackdotresearch(clean_text)
-        
-                elif domain == 'todayonline.com':
-                    clean_text = process_text_todayonline(clean_text)     
-                    
-                elif domain == 'singaporeuncensored.com':
-                    clean_text = process_text_singaporeuncensored(clean_text)   
-                    
-                elif domain == 'mustsharenews.com':
-                    clean_text = process_text_mustsharenews(clean_text)    
-                    
-                elif domain == 'straitstimes.com':
-                    clean_text = process_text_straitstimes(clean_text)     
-                    
-                elif domain == 'tnp.sg':
-                    clean_text = process_text_tnp(clean_text)      
-                    
-                elif domain == 'getindianews.com':
-                    clean_text = process_text_getindianews(clean_text)
-                    
-                elif domain == 'theindependent.sg':
-                    clean_text = process_text_theindependent(clean_text)
-                    
-                elif domain == 'cnsnews.com':
-                    clean_text = process_text_cnsnews(clean_text)
-                    
-                elif domain == 'reuters.com':
-                    clean_text = process_text_reuters(clean_text)
-                    
-                else:
-                    clean_text = process_text_general(clean_text)
-                    
-                clean_text = ' '.join(clean_text.split()[0:350])
-                #summary = summarise_text(clean_text)
-                
-    else:
-        summary = 'None'
-
-
-    df.loc[num] = [file_name, full_matching_url, matching_image_url, matching_title, ocr_text, summary]
-
-df.to_csv('image_titles_summary.csv')
-'''
