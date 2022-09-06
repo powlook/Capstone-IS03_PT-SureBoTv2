@@ -30,9 +30,23 @@ def process_title(text):
 
 def process_ocr(text):
     
+    with open('redundant_words.txt', 'r') as f:
+        redundantwords = f.readlines()
+        f.close()
+    r_words = [word.replace('\n', '') for word in redundantwords]
+
+    with open('redundant_phrases.txt', 'r') as f:
+        redundantphrase = f.readlines()
+        f.close()
+    redundantphrase = [phrase.replace('\n','') for phrase in redundantphrase]
+    
     text = text.replace('\n', ' ')
+    text = text.replace('/', ' ')
     text = re.sub(r'[^\x00-\x7F]', '', text)
+    for phrase in redundantphrase:
+        text = text.replace(phrase, '')
     text = text.split()
+    text = [word for word in text if word not in r_words]
     #text = [word for word in text if len(word) < 20]
     #text = [word for word in text if word.lower() in english_words and word.lower().isalnum()]
     text = ' '.join([x for x in text])
