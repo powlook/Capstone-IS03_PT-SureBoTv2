@@ -33,13 +33,13 @@ Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Hu
 
 **Step 1: Get the repository**
 
-Using `git clone`
+Using `git clone <Github Repo URL>`
 ```
 git clone 
 ```
 **Step 2: Create a Conda Environment**
 
-Create a new environment to sandbox your developmental workspace
+Create a new environment to sandbox your developmental workspace (with Anaconda Prompt)
 ```
 conda create -n "YOUR_ENV_NAME" python=3.7
 ```
