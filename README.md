@@ -73,6 +73,9 @@ pipeline_models/models/bart-large-cnn
 	2layerbest.pth
 	3layerbest.pth
 	4layerbest.pth
+	
+pipeline_models/trained_models
+	finalized_model.pkl
 ```
 **Step 5: Download Spacy Model**
 
