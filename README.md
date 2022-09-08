@@ -52,11 +52,7 @@ pip install -r requirements.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained models**: https://drive.google.com/uc?id=1jxUd27-K51AkRX20yEHtban8Uvab7lkX
-
-Unzip the file inside the directory **Capstone-IS03_PT-SureBoTv2/Code**
-
-Alternatively you can run the script **DownloadModels.py** to download and unzip the models. Please replace **<MODEL-DOWNLOAD-URL>** with the above link in the script.
+**Download pretrained & trained models**: https://drive.google.com/file/d/1es9Flm56HYWD5G2MUcQLmW0ANYLZ-Gl_/view?usp=sharing
 
 The folder structure will look like this:
 ```
