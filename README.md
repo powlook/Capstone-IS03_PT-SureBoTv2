@@ -79,6 +79,15 @@ Download ``en_core_web_sm`` via the following command
 ```
 python -m spacy download en_core_web_sm
 ```
+
+**Step 6: Download Detectron Model**
+
+**Download link: https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
+
+```
+folder: detectron2
+```
+
 ### Usage
 We provide 3 methods to implement the system architecture: Command-Line Interface, Localhost Server Bot & Telegram Bot Deployment on GCE
 
