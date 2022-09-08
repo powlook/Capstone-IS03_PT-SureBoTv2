@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained & trained models**: https://drive.google.com/file/d/1es9Flm56HYWD5G2MUcQLmW0ANYLZ-Gl_/view?usp=sharing
+**Download pretrained & trained models**: https://drive.google.com/file/d/1Apdd-ukf5DSkP2Zi360sOesRcwH4dYUM/view?usp=sharing
 
 The folder structure will look like this:
 ```
@@ -82,7 +82,7 @@ python -m spacy download en_core_web_sm
 
 **Step 6: Download Detectron Model**
 
-**Download link: https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
+**Download link:** https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
 
 ```
 folder: detectron2
