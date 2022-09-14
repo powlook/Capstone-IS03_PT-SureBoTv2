@@ -33,13 +33,13 @@ Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Hu
 
 **Step 1: Get the repository**
 
-Using `git clone`
+Using `git clone 
 ```
-git clone 
+git clone <Github Repo URL>`
 ```
 **Step 2: Create a Conda Environment**
 
-Create a new environment to sandbox your developmental workspace
+Create a new environment to sandbox your developmental workspace (with Anaconda Prompt)
 ```
 conda create -n "YOUR_ENV_NAME" python=3.7
 ```
@@ -52,11 +52,7 @@ pip install -r requirements.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained models**: https://drive.google.com/uc?id=1jxUd27-K51AkRX20yEHtban8Uvab7lkX
-
-Unzip the file inside the directory **Capstone-IS03_PT-SureBoTv2/Code**
-
-Alternatively you can run the script **DownloadModels.py** to download and unzip the models. Please replace **<MODEL-DOWNLOAD-URL>** with the above link in the script.
+**Download pretrained & trained models**: https://drive.google.com/file/d/1Apdd-ukf5DSkP2Zi360sOesRcwH4dYUM/view?usp=sharing
 
 The folder structure will look like this:
 ```
@@ -73,6 +69,9 @@ pipeline_models/models/bart-large-cnn
 	2layerbest.pth
 	3layerbest.pth
 	4layerbest.pth
+	
+pipeline_models/trained_models
+	finalized_model.pkl
 ```
 **Step 5: Download Spacy Model**
 
@@ -80,6 +79,15 @@ Download ``en_core_web_sm`` via the following command
 ```
 python -m spacy download en_core_web_sm
 ```
+
+**Step 6: Download Detectron Model**
+
+**Download link:** https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
+
+```
+folder: detectron2
+```
+
 ### Usage
 We provide 3 methods to implement the system architecture: Command-Line Interface, Localhost Server Bot & Telegram Bot Deployment on GCE
 
