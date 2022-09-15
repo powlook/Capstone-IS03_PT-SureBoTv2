@@ -89,6 +89,78 @@ python -m spacy download en_core_web_sm
 folder: detectron2
 ```
 
+### Installation (v2.0)
+Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Huggingface
+
+**Step 1: Get the repository**
+
+Using `git clone 
+```
+git clone <Github Repo URL>`
+```
+**Step 2: Create a Virtual Environment**
+
+Enter folder and create a new environment to sandbox your developmental workspace (with Command Prompt)
+```
+cd Code
+py -3.7 -m venv "YOUR_ENV_NAME"
+```
+**Step 3: Install torch dependencies**
+
+Install requirements using `pip`
+```
+pip install -r torch.txt
+```
+**Step 4: Download the Models**
+
+**Download pretrained & trained models and replace the pipeline_models folder**: https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
+
+The folder structure will look like this:
+```
+pipeline_models/pretrained_models/BERT-Pair/
+    	pytorch_model.bin
+    	vocab.txt
+    	bert_config.json
+    	
+pipeline_models/models/bart-large-cnn
+	msmarco-distilroberta-base-v2
+	pegasus-cnn_dailymail
+	stsb-distilbert-base
+	1layerbest.pth
+	2layerbest.pth
+	3layerbest.pth
+	4layerbest.pth
+	
+pipeline_models/trained_models
+	finalized_model_cpu.pkl
+	finalized_model_gpu.pkl
+```
+
+**Step 5: Download Detectron Model**
+
+**Download model and replace the detectron2 folder:** https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
+
+```
+folder: detectron2
+```
+
+**Step 6: Install Detectron2 Model**
+
+Install detectron2 based on the download models via the following command
+```
+python -m pip install -e detectron2
+```
+
+**Step 7: Install Remaining Dependencies**
+
+Install remaining dependencies via the following command
+```
+pip install -r requirements.txt
+```
+
+
+
+
 ### Usage
 We provide 3 methods to implement the system architecture: Command-Line Interface, Localhost Server Bot & Telegram Bot Deployment on GCE
 
