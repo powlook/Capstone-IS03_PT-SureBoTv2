@@ -1,7 +1,7 @@
 import os, pickle, warnings
 import numpy as np
 import pandas as pd
-import torch
+import torch, random
 import torch.nn as nn
 from torchinfo import summary
 from transformers import BertTokenizer, AutoModel
@@ -10,6 +10,15 @@ from embedding_utils.text_embeddings import new_sumtext
 from embedding_utils.visual_embeddings import img_visual_embeds, img2bgr
 
 warnings.filterwarnings("ignore")
+
+seed = 123
+torch.manual_seed(seed)
+torch.cuda.manual_seed(seed)
+torch.cuda.manual_seed_all(seed)
+np.random.seed(seed)
+random.seed(seed)
+torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
 
 class Classifier(nn.Module):
     
@@ -56,7 +65,11 @@ def vb_inference(img_path, text):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     #print(torch.cuda.get_device_name(0))
     #print(torch.cuda.get_device_properties(0))
-    model_file = 'pipeline_models/finalized_model.pkl'
+    if device == "cpu":
+        model_file = 'pipeline_models/trained_model/finalized_model_cpu.pkl'
+    else:
+        model_file = 'pipeline_models/trained_model/finalized_model_gpu.pkl'
+    model_file = os.path.join(os.getcwd(), model_file)
     #model = AutoModel.from_pretrained('uclanlp/visualbert-nlvr2-coco-pre')
 
     img_bgrlist = img2bgr(img_path)
@@ -90,6 +103,7 @@ def vb_inference(img_path, text):
             #    print("Output: REFUTES")
             #elif predicted_class == 1:
             #    print("Output: SUPPORTS")
+            # print(predicted_class)
     
     return outcome[predicted_class]
 

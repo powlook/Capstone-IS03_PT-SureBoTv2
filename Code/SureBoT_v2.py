@@ -43,7 +43,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
 #Use this at the top of your python code
 from google.cloud import vision_v1
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 device_cpu = 'cpu'
 
 # Params - ER
@@ -144,6 +144,7 @@ def executePipeline(query, input_image, surebot_logger):
         for token in myDoc:
             sentenceToken.append(token.text)
 
+        print("*******RUNNING VISUALBERT******")
         vb_outcome = vb_inference(input_image, querytext)
 
         print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
