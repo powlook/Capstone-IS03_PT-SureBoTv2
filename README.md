@@ -119,7 +119,7 @@ pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu1
 ```
 **Step 4: Download the Models**
 
-**Download pretrained & trained models and replace the pipeline_models folder**: https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
+**Download pretrained & trained models and replace the pipeline_models folder**: <br/>https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
 
 The folder structure will look like this:
 ```
@@ -144,7 +144,7 @@ pipeline_models/trained_models
 
 **Step 5: Download Detectron Model**
 
-**Download model and replace the detectron2 folder:** https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
+**Download model and replace the detectron2 folder:** <br/>https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
 
 ```
 folder: detectron2
