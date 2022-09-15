@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained & trained models**: https://drive.google.com/file/d/1Apdd-ukf5DSkP2Zi360sOesRcwH4dYUM/view?usp=sharing
+**Download pretrained & trained models**: https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
 
 The folder structure will look like this:
 ```
@@ -71,7 +71,8 @@ pipeline_models/models/bart-large-cnn
 	4layerbest.pth
 	
 pipeline_models/trained_models
-	finalized_model.pkl
+	finalized_model_cpu.pkl
+	finalized_model_gpu.pkl
 ```
 **Step 5: Download Spacy Model**
 
