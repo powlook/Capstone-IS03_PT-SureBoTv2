@@ -165,8 +165,6 @@ pip install -r requirements.txt
 ```
 
 
-
-
 ### Usage
 We provide 3 methods to implement the system architecture: Command-Line Interface, Localhost Server Bot & Telegram Bot Deployment on GCE
 
@@ -179,7 +177,7 @@ For Command-Line Interface: Quick way to test out fact-checking functionality:
 ```
 python SureBoT_v2.py
 ```
-**Step 2: Input Query Claim** <br/>Note: The images to be verified need to be uploaded in the <images> folder beforehand.
+**Step 2: Input Query Claim** <br/>Note: The images to be verified need to be uploaded in the "images" folder beforehand.
 ```
 SureBoT: Input the image file that you would like to verify:
 ```
