@@ -112,7 +112,7 @@ Install requirements using `pip`
 pip install -r torch.txt
 ```
 
-For CUDA users, download the relevant torch dependencies based on https://pytorch.org/get-started/locally/.
+For CUDA users, download the relevant torch dependencies based on https://pytorch.org/get-started/locally/. <br/>
 Below is an example of installation for CUDA version 11.3
 ```
 pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
