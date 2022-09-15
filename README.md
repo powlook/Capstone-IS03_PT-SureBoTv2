@@ -179,9 +179,9 @@ For Command-Line Interface: Quick way to test out fact-checking functionality:
 ```
 python SureBoT_v2.py
 ```
-**Step 2: Input Query Claim**
+**Step 2: Input Query Claim** <br/>Note: The images to be verified need to be uploaded in the <images> folder beforehand.
 ```
-SureBoT: Input a claim that you would like to fact-check!
+SureBoT: Input the image file that you would like to verify:
 ```
 **Step 3: Enter and Process Claim**
 
