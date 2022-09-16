@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained & trained models**: https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
+**Download pretrained & trained models**: https://drive.google.com/file/d/1prOq2fIJpoab4hyeDBB4UGedH0Hwf2u-/view?usp=sharing
 
 The folder structure will look like this:
 ```
@@ -112,7 +112,7 @@ pip install -r torch.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained & trained models and replace the pipeline_models folder**: <br/>https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
+**Download pretrained & trained models and replace the pipeline_models folder**: <br/>https://drive.google.com/file/d/1prOq2fIJpoab4hyeDBB4UGedH0Hwf2u-/view?usp=sharing
 
 The folder structure will look like this:
 ```
