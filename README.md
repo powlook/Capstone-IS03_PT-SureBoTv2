@@ -71,8 +71,7 @@ pipeline_models/models/bart-large-cnn
 	4layerbest.pth
 	
 pipeline_models/trained_models
-	finalized_model_cpu.pkl
-	finalized_model_gpu.pkl
+	finalized_model.pkl
 ```
 **Step 5: Download Spacy Model**
 
@@ -111,12 +110,6 @@ Install requirements using `pip`
 ```
 pip install -r torch.txt
 ```
-
-For CUDA users, download the relevant torch dependencies based on https://pytorch.org/get-started/locally/. <br/>
-Below is an example of installation for CUDA version 11.3
-```
-pip install torch==1.12.1+cu113 torchvision==0.13.1+cu113 torchaudio==0.12.1+cu113 --extra-index-url https://download.pytorch.org/whl/cu113
-```
 **Step 4: Download the Models**
 
 **Download pretrained & trained models and replace the pipeline_models folder**: <br/>https://drive.google.com/file/d/1ziDtJRX_MRQweU8xLtbYyMuyue4ELYQP/view?usp=sharing
@@ -138,8 +131,7 @@ pipeline_models/models/bart-large-cnn
 	4layerbest.pth
 	
 pipeline_models/trained_models
-	finalized_model_cpu.pkl
-	finalized_model_gpu.pkl
+	finalized_model.pkl
 ```
 
 **Step 5: Download Detectron Model**
