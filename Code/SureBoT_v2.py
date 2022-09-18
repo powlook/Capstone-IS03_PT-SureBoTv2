@@ -43,7 +43,7 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
 #Use this at the top of your python code
 from google.cloud import vision_v1
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 device_cpu = 'cpu'
 
 # Params - ER
@@ -128,7 +128,10 @@ def executePipeline(query, input_image, surebot_logger):
                 print(clean_title)
                 matching_title.append(clean_title)
                 word_count.append(len(clean_title.split()))
-            if max(word_count) > 10:
+            print('word_count :', word_count)
+            if word_count == '':
+                query = ''
+            elif max(word_count) > 10:
                 max_idx = word_count.index(max(word_count))
                 query = matching_title[max_idx]
             else:
@@ -136,7 +139,8 @@ def executePipeline(query, input_image, surebot_logger):
 
         # Query Preprocessing
         querytext = query_preprocessing(query, surebot_logger)
-
+        print('query     :', query)
+        print('querytext :', querytext)
         # Use SPACY to get number of tokens
         nlp = English()
         myDoc = nlp(querytext)
@@ -144,7 +148,6 @@ def executePipeline(query, input_image, surebot_logger):
         for token in myDoc:
             sentenceToken.append(token.text)
 
-        print("*******RUNNING VISUALBERT******")
         vb_outcome = vb_inference(input_image, querytext)
 
         print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
@@ -172,14 +175,15 @@ def executePipeline(query, input_image, surebot_logger):
         print(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
         surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
 
-        output_message = "===== FACT CHECK RESULTS ====="
+        output_message = ""
+        #output_message = "===== FACT CHECK RESULTS ====="
         #output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
         #output_message += "\nQuery Input: {}".format(query)
 
         if len(Filtered_Articles) == 0:
-            output_message += '\n\nNO MATCHING ARTICLES FOUND. NOT ENOUGH EVIDENCE!'
-            print(f'NO MATCHING ARTICLES FOUND. NOT ENOUGH EVIDENCE!')
-            surebot_logger.info(f'NO MATCHING ARTICLES FOUND. NOT ENOUGH EVIDENCE!')
+            output_message += 'NO MATCHING ARTICLES FOUND'
+            print(f'NO MATCHING ARTICLES FOUND')
+            surebot_logger.info(f'NO MATCHING ARTICLES FOUND')
         else:
             # Run Fact Verification - Graph NET
             graphNet = graphNetFC(cwd, device_cpu, feature_num, evidence_num, graph_layers,
@@ -222,13 +226,13 @@ def executePipeline(query, input_image, surebot_logger):
                 print(f'************** FINAL SCORE: REFUTES')
                 surebot_logger.info(f'************** FINAL SCORE: REFUTES')
 
-            output_message += '\n\nFINAL SCORE: ' + final_score
             output_message += "\n\n----- Total Articles Found: {} -----".format(len(Filtered_Articles))
-            for i in range(len(Filtered_Articles)):
-                output_message += "\n\nURL {}".format(i+1)
-                output_message += '\n' + Filtered_Articles[i][2] + '\n*[Summary]* '
-                for j in range(len(Filtered_Articles[i][1])):
-                    output_message += Filtered_Articles[i][1][j]
+            #for i in range(len(Filtered_Articles)):
+            #    output_message += "\n\nURL {}".format(i+1)
+            #    output_message += '\n' + Filtered_Articles[i][2] + '\n*[Summary]* '
+            #    for j in range(len(Filtered_Articles[i][1])):
+            #        output_message += Filtered_Articles[i][1][j]
+            output_message += '\n\nFINAL SCORE: ' + final_score
 
     except Exception as e:
         if isinstance(e, SoftTimeLimitExceeded):
@@ -237,7 +241,7 @@ def executePipeline(query, input_image, surebot_logger):
             output_message = 'Exception occurred in pipeline'
             print(e)
     
-    return output_message, vb_outcome    #, final_score, len(Filtered_Articles)
+    return final_score, vb_outcome    #, final_score, len(Filtered_Articles)
 
 
 def remove_emoji(text):
@@ -342,6 +346,6 @@ if __name__ == "__main__":
         print(f'\n\nProcessing your claim......', file_name)
         surebot_logger.info(input_claim)
         result, vb_result = executePipeline(input_claim, img_filepath, surebot_logger)
-        result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
+        #result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
         print('Reverse Image Search Results :', result)
         print('Visual Bert Comparison Results :', vb_result)

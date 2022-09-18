@@ -20,6 +20,7 @@ prediction results.
 import numpy as np
 import os
 import time
+import logging
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -324,15 +325,16 @@ def main():
     'The department released a statement on social media to combat the misinformation']
 
     cwd = os.path.dirname(__file__)
-
+    graphNet_logger = logging.getLogger()
     graphNet = graphNetFC(cwd, device, feature_num, evidence_num, graph_layers, 
-                            num_class, graph_pool, sequence_length)
+                            num_class, graph_pool, sequence_length, graphNet_logger)
 
     answer, outputs, heatmap = graphNet.predict(input_claim, input_evidence)
    
     print(answer)
     print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
-    print((np.array(outputs)))
+    #print((np.array(outputs)))
+    print((np.array(outputs.detach().cpu())))
 
     # Plot Attention Heat map to visualize
     ax = sns.heatmap(heatmap, linewidth=1.0, cmap="YlGnBu")
