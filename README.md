@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ```
 **Step 4: Download the Models**
 
-**Download pretrained & trained models**: https://drive.google.com/file/d/1Apdd-ukf5DSkP2Zi360sOesRcwH4dYUM/view?usp=sharing
+**Download pretrained & trained models**: https://drive.google.com/file/d/1prOq2fIJpoab4hyeDBB4UGedH0Hwf2u-/view?usp=sharing
 
 The folder structure will look like this:
 ```
@@ -88,6 +88,75 @@ python -m spacy download en_core_web_sm
 folder: detectron2
 ```
 
+### Installation (v2.0)
+Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Huggingface
+
+**Step 1: Get the repository**
+
+Using `git clone 
+```
+git clone <Github Repo URL>`
+```
+**Step 2: Create a Virtual Environment**
+
+Enter folder and create a new environment to sandbox your developmental workspace (with Command Prompt)
+```
+cd Code
+py -3.7 -m venv "YOUR_ENV_NAME"
+```
+**Step 3: Install torch dependencies**
+
+Install requirements using `pip`
+```
+pip install -r torch.txt
+```
+**Step 4: Download the Models**
+
+**Download pretrained & trained models and replace the pipeline_models folder**: <br/>https://drive.google.com/file/d/1prOq2fIJpoab4hyeDBB4UGedH0Hwf2u-/view?usp=sharing
+
+The folder structure will look like this:
+```
+pipeline_models/pretrained_models/BERT-Pair/
+    	pytorch_model.bin
+    	vocab.txt
+    	bert_config.json
+    	
+pipeline_models/models/bart-large-cnn
+	msmarco-distilroberta-base-v2
+	pegasus-cnn_dailymail
+	stsb-distilbert-base
+	1layerbest.pth
+	2layerbest.pth
+	3layerbest.pth
+	4layerbest.pth
+	
+pipeline_models/trained_models
+	finalized_model.pkl
+```
+
+**Step 5: Download Detectron Model**
+
+**Download model and replace the detectron2 folder:** <br/>https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
+
+```
+folder: detectron2
+```
+
+**Step 6: Install Detectron2 Model**
+
+Install detectron2 based on the download models via the following command
+```
+python -m pip install -e detectron2
+```
+
+**Step 7: Install Remaining Dependencies**
+
+Install remaining dependencies via the following command
+```
+pip install -r requirements.txt
+```
+
+
 ### Usage
 We provide 3 methods to implement the system architecture: Command-Line Interface, Localhost Server Bot & Telegram Bot Deployment on GCE
 
@@ -100,9 +169,9 @@ For Command-Line Interface: Quick way to test out fact-checking functionality:
 ```
 python SureBoT_v2.py
 ```
-**Step 2: Input Query Claim**
+**Step 2: Input Query Claim** <br/>Note: The images to be verified need to be uploaded in the "images" folder beforehand.
 ```
-SureBoT: Input a claim that you would like to fact-check!
+SureBoT: Input the image file that you would like to verify:
 ```
 **Step 3: Enter and Process Claim**
 
