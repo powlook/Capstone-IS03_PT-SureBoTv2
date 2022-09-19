@@ -1,0 +1,55 @@
+<html>
+  <!--<link rel="shortcut icon" href="data:" />-->
+   <body>
+     <form action="/" method="POST">
+        <header>
+          <div>
+            <img src="static/logo.jpeg" class ="center"/>
+          </div>
+        </header>
+      </form>
+
+      <h2 style="text-align:center">Please upload an image that you would like to check.</h2>
+
+      <h3 style="text-align:center">
+        <div id="image_input">
+          <form action="/image" method="post" enctype="multipart/form-data">
+          </select><p>
+            <label for="title">Image Input: </label>
+            <input type = "file" name = "File" accept="image/png, image/jpg, image/jpeg"/>
+            <input type = "submit" value="Submit"/>
+          </form>
+        </div>
+      </h3>
+
+      <style>
+        .center {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+          width: 40%;
+        }
+      </style>
+
+      <script type="text/javascript">
+        var y = document.getElementById("image_input");
+        y.style.display = "block"
+
+        function goToNewPage()
+        {
+            var url = "/image";
+            window.location = url;
+        }
+      </script>
+   </body>
+</html>
+
+<!-- <script type="text/javascript">
+  function goToNewPage()
+  {
+      var url = document.getElementById('list').value;
+      if(url != 'none') {
+          window.location = url;
+      }
+  }
+</script> -->

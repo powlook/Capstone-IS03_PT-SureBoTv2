@@ -1,0 +1,54 @@
+<html>
+   <body>
+     <form action="/image">
+      <header>
+        <div class="container">
+        <h1 class="logo" id="Title">SureBoT</h1>
+        </div>
+        <div id="content">
+          <img src="static/logo.jpeg" class ="ribbon"/>
+        </div>
+      </header>
+
+      <style>
+        #content {
+            position: relative;
+        }
+        #content img {
+            position: absolute;
+            top: 0px;
+            right: 0px;
+            height: 300px;
+        }
+      </style>
+    </form>
+
+    <img src="{{ filepath }}" height=400/>
+    <br><br>
+
+    <form action="/">
+      <input type="submit" value= "Back to Home Page" />
+    </form>
+
+    <h3>External Image Retrieval: {{ rev_image }}</h3>
+    <h3>Joint Visual-Linguistics Modelling: {{ vb_outcome }}</h3>
+    <h3>Image Doctoring Detection: {{ img_doctoring }}</h3>
+    <h3>Text Classification: {{ text_cls }}</h3>
+
+    <br>
+    <br>
+    <h3>Final Outcome: {{ final }}</h3>
+    
+
+    <!-- <hr style="height:4px;border:none;color:#333;background-color:#333;">
+      
+      {% for imgD in imageResults_list%}
+        {% for url in links %}
+          {% if imgD in url %} 
+          <img src="{{ url }}" width=200, height=200/>
+          {% endif %}
+        {% endfor %}
+      {% endfor %} -->
+
+   </body>
+</html>
