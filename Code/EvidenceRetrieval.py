@@ -71,14 +71,15 @@ class EvidenceRetrieval(object):
         #self.logger.info('\n*******DISTILROBERTA MODEL LOADED*******')
         #self.logger.info(f'>>>>>>> TIME TAKEN - MODELS LOADING: {time.time() - start_time}')
 
+
     def AbstractiveSummary(self, input_text, length_penalty):
         start_time = time.time()
         batch = self.PegasusTokenizer(input_text, truncation=True, max_length=1024, padding='longest', return_tensors="pt").to(
             self.device)
         translated = self.PegasusModel.generate(**batch, length_penalty=length_penalty)
         summary = self.PegasusTokenizer.batch_decode(translated, skip_special_tokens=True)
-        print('\n**********ABSTRACTIVE SUMMARY*************')
-        self.logger.info('\n*********ABSTRACTIVE SUMMARY************')
+        print('**********ABSTRACTIVE SUMMARY*************')
+        self.logger.info('*********ABSTRACTIVE SUMMARY************')
         summary = "".join(summary)
         print(summary)
         self.logger.info(summary)
@@ -89,6 +90,9 @@ class EvidenceRetrieval(object):
         return summary
 
     def ReverseImageSearch(self, input_text, image_filepath, topN):
+
+        def isNaN(query):
+            return query != query
 
         cwd = os.path.dirname(os.path.realpath(__file__))
         query_image = QueryImage(cwd)
@@ -101,14 +105,18 @@ class EvidenceRetrieval(object):
         _, match = query_image.detect_web(image_filepath)
 
         for i, item in enumerate(match):
-            domain = re.findall(regex, item.url)[0]          
-            if domain in whitelist:                
-                #clean_title = process_title(item.page_title)
+            domain = re.findall(regex, item.url)[0] 
+            if domain in whitelist:
+                #print('domain :', domain)   
+                clean_title = process_title(item.page_title)
                 #print('clean_title :', clean_title)
                 text = query_image.extract_text_from_html(html_text, item.url)
+                #if not isNaN(text):
+                #    print('length of html_text :', len(text))
                 clean_text = process_text(text, domain)
+                #if not isNaN(clean_text):                
+                #    print('length of clean_text :', len(clean_text.split()))
                 if len(clean_text.split()) > 50:
-                    #print(clean_text)
                     clean_text_list.append(clean_text)
                     articleurls.append(item.url)
 
@@ -144,50 +152,44 @@ class EvidenceRetrieval(object):
         #####################################################
         # Search Googlenews & Extract Articles
         #####################################################
-        search = self.pygn.search(input_text)
         articleurls, articlesummarylist, similaritylist = [], [], []
 
+        search = self.pygn.search(input_text)
         # Extract list of article urls
         for article_num in range(len(search["entries"])):
             article_info = search["entries"][article_num]["links"]
             articleurls.append(article_info[-1]["href"])
-        print('\n********** Search Articles through Google News **********')
+        print('\n******* Search Articles through Google News *******')
         print(f'\n******* Found No. of articles = {len(articleurls)} *******')
         self.logger.info(f'\n******* Found No. of articles = {len(articleurls)} *******')
 
         # Summarize the article (take TopN where N is number of articles)
         for article_url in articleurls[:topN]:
-            try:
+            #try:
 
-                # article = Article(article_url)
-                # article.download()
-                # article.parse()
-                # article.nlp()
-                # article_text = article.text
+            article_text = fulltext(requests.get(article_url, headers=self.headers).text)
 
-                article_text = fulltext(requests.get(article_url, headers=self.headers).text)
+            # ************************#
+            # RUN PEGASUS
+            # ************************#
+            print(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
+            # print(article_text)
+            # self.logger.info(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
+            # self.logger.info(article_text)
+            articlesummary = self.AbstractiveSummary(article_text, length_penalty)
+            #print('Article Summary: ' + articlesummary)
+            #self.logger.info('Article Summary: ' + articlesummary)
+            articlesummarylist.append("".join(articlesummary))
+            #print('Abstraction has completed')
+            #self.logger.info('Abstraction has completed')
 
-                # ************************#
-                # RUN PEGASUS
-                # ************************#
-                print(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
-                # print(article_text)
-                self.logger.info(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
-                # self.logger.info(article_text)
-                articlesummary = self.AbstractiveSummary(article_text, length_penalty)
-                #print('Article Summary: ' + articlesummary)
-                #self.logger.info('Article Summary: ' + articlesummary)
-                articlesummarylist.append("".join(articlesummary))
-                #print('Abstraction has completed')
-                #self.logger.info('Abstraction has completed')
-
-            except Exception as e:
-                if isinstance(e, SoftTimeLimitExceeded):
-                    raise
-                else:
-                    print('SUMMARISATION ERROR')
-                    self.logger.info('SUMMARISATION ERROR')
-                    articlesummarylist.append("")
+            #except Exception as e:
+            #    if isinstance(e, SoftTimeLimitExceeded):
+            #        raise
+            #    else:
+            #        print('SUMMARISATION ERROR')
+            #        self.logger.info('SUMMARISATION ERROR')
+            #        articlesummarylist.append("")
 
         # Retrieve Sentence Embeddings for input query
         query_embedding = self.semanticSimilarity(input_text, max_length)
@@ -243,8 +245,9 @@ class EvidenceRetrieval(object):
 
 
 def main(query):
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    print(f'DEVICE Available: {device}')
+    #device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
+    #print(f'DEVICE Available: {device}')
 
     #####################################################
     # Initialization
@@ -265,6 +268,11 @@ def main(query):
     # query = "https://newnaratif.com/podcast/an-interview-with-dr-paul-tambyah/"
     # query = "https://www.straitstimes.com/tech/tech-news/whatsapp-delays-data-sharing-change-after-backlash-sees-users-flock-to-rivals"
     #query = "Travellers queueing to enter Woodlands Checkpoint yesterday. Hundreds were waiting in line when The Straits Times visited the checkpoint at about 8pm. ST PHOTOS: FELINE LIM"
+    def isNaN(query):
+        return query != query
+   
+    if isNaN(query):
+        query = ''
     print(f'INPUT QUERY: {query}')
 
     # Check URL Validity
@@ -287,7 +295,7 @@ def main(query):
 
     # If tokens > 50 - Perform Abstractive Summary on Query
     # Else just skip and perform Doc Retrieval
-    if len(sentenceToken) > 50:
+    if len(sentenceToken) > 20:
         querytext = ER_pipeline.AbstractiveSummary(querytext, length_penalty)
 
     # Run ER pipeline
@@ -300,6 +308,6 @@ def main(query):
 if __name__ == "__main__":
 
     df = pd.read_excel('ocr_text_220818.xlsx', usecols=['filename', 'ocr_text'])
-    ocr_text =df.loc[12]['ocr_text']
-    print(ocr_text)
+    ocr_text =df.loc[4]['ocr_text']
+    print('Query -ocr_text :', ocr_text)
     main(ocr_text)

@@ -33,7 +33,7 @@ from utils import load_bert_features_claim_inference
 from Models import GEAR
 
 BERTpretrained_dir = 'pipeline_models/pretrained_models/BERT-Pair/'
-graphNet_model_dir = 'pipeline_models/models/2layerbest.pth.tar'
+graphNet_model_dir = 'pipeline_models/models/4layerbest.pth.tar'
 
 feature_num = 768
 evidence_num = 5

@@ -43,14 +43,15 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
 #Use this at the top of your python code
 from google.cloud import vision_v1
 
-device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+#device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 device_cpu = 'cpu'
 
 # Params - ER
 length_penalty = 1.5
 topN = 5
 max_length = 128
-dist_thres = 0.4
+dist_thres = 0.3
 # Params - GraphNET
 feature_num = 768
 evidence_num = 5
@@ -104,9 +105,9 @@ def executePipeline(query, input_image, surebot_logger):
     # Initialization
     #####################################################
     try:
-        print(f'DEVICE Available: {device}')
+        print(f'DEVICE Used : {device}')
         surebot_logger.info(f'\n=============== NEW QUERY ===============')
-        surebot_logger.info(f'DEVICE Available: {device}')
+        surebot_logger.info(f'DEVICE Used : {device}')
         start = time.time()
         cwd = os.path.dirname(os.path.realpath(__file__))
         print(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
@@ -120,7 +121,9 @@ def executePipeline(query, input_image, surebot_logger):
         # Get title from web-pages if ocr_text is []
         # We will accept a title for the image search if the length
         # of the title is > 10 words
+
         if query == '':
+            print('\n*******GET TITLES OF WEB PAGES FOR TEXT EXTRACTION*******')
             _, match = query_image.detect_web(input_image)
 
             for i, item in enumerate(match):
@@ -129,110 +132,122 @@ def executePipeline(query, input_image, surebot_logger):
                 matching_title.append(clean_title)
                 word_count.append(len(clean_title.split()))
             print('word_count :', word_count)
-            if word_count == '':
+            if word_count == []:
                 query = ''
             elif max(word_count) > 10:
                 max_idx = word_count.index(max(word_count))
                 query = matching_title[max_idx]
             else:
                 query = ''
-
-        # Query Preprocessing
-        querytext = query_preprocessing(query, surebot_logger)
-        print('query     :', query)
-        print('querytext :', querytext)
-        # Use SPACY to get number of tokens
-        nlp = English()
-        myDoc = nlp(querytext)
+            print('web_title query', query)
+            
+        # To check if the ocr_text query is empty then return not detected
         sentenceToken = []
-        for token in myDoc:
-            sentenceToken.append(token.text)
-
-        vb_outcome = vb_inference(input_image, querytext)
-
-        print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
-        surebot_logger.info(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
-        print(sentenceToken)
-        surebot_logger.info(sentenceToken)
-
-        # If tokens > 50 - Perform Abstractive Summary on Query
-        # Else just skip and perform Doc Retrieval
-        if len(sentenceToken) > 50:
-            querytext = ER_pipeline.AbstractiveSummary(querytext, length_penalty)
-
-        # Run ER pipeline
-        start_time = time.time()
-
-        Filtered_Articles = ER_pipeline.RetrieveArticles(querytext, topN)
-        Image_Articles = ER_pipeline.ReverseImageSearch(querytext, input_image, topN)
-        Filtered_Articles = Filtered_Articles + Image_Articles
-
-        print(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
-        surebot_logger.info(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
-
-        print(f'===== ARTICLES RETRIEVAL RESULTS =====')
-        surebot_logger.info(f'\n===== ARTICLES RETRIEVAL RESULTS =====')
-        print(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
-        surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
-
-        output_message = ""
-        #output_message = "===== FACT CHECK RESULTS ====="
-        #output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
-        #output_message += "\nQuery Input: {}".format(query)
-
-        if len(Filtered_Articles) == 0:
-            output_message += 'NO MATCHING ARTICLES FOUND'
-            print(f'NO MATCHING ARTICLES FOUND')
-            surebot_logger.info(f'NO MATCHING ARTICLES FOUND')
+        querytext = ''
+        if query == '':
+            vb_outcome = 'NO RELEVANT OCR_TEXT DETECTED'
+            final_score =  'NO RELEVANT OCR_TEXT DETECTED'
+            
         else:
-            # Run Fact Verification - Graph NET
-            graphNet = graphNetFC(cwd, device_cpu, feature_num, evidence_num, graph_layers,
-                                  num_class, graph_pool, sequence_length, surebot_logger)
+            # Query Preprocessing
+            #querytext = query_preprocessing(query, surebot_logger)
+            querytext = query[0]
+            
+            # Use SPACY to get number of tokens
+            nlp = English()
+            myDoc = nlp(querytext)
+            for token in myDoc:
+                sentenceToken.append(token.text)
 
-            FactVerification_List = []
-            for i in range(len(Filtered_Articles)):
-                pred_dict, outputs, heatmap = graphNet.predict(querytext, Filtered_Articles[i][1])
+            vb_outcome = vb_inference(input_image, querytext)
 
-                FactVerification_List.append(pred_dict['predicted_label'])
-                print(pred_dict)
-                surebot_logger.info(pred_dict)
-                print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
-                surebot_logger.info('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
-                print((np.array(outputs.detach().cpu())))
-                surebot_logger.info((np.array(outputs.detach().cpu())))
-
-                # Plot Attention Heat map to visualize
-                # ax = sns.heatmap(heatmap, linewidth=1.0, cmap="YlGnBu")
-                # plt.show()
-                # plt.clf()
-
-            maj_vote = 0
-            for i in range(len(Filtered_Articles)):
-                print(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
-                surebot_logger.info(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
-                if FactVerification_List[i] == 'SUPPORTS':
-                    maj_vote += 1
-
-            if (maj_vote / len(Filtered_Articles)) > 0.6:
-                final_score = 'SUPPORTS'
-                print(f'************** FINAL SCORE: SUPPORTS')
-                surebot_logger.info(f'************** FINAL SCORE: SUPPORTS')
-            elif (maj_vote / len(Filtered_Articles)) == 0.5:
-                final_score = 'NOT ENOUGH EVIDENCE'
-                print(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
-                surebot_logger.info(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
+            print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
+            surebot_logger.info(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
+            surebot_logger.info(sentenceToken)
+    
+            # If tokens > 50 - Perform Abstractive Summary on Query
+            # Else just skip and perform Doc Retrieval
+    
+            Filtered_Articles = []
+            # Run ER pipeline
+            start_time = time.time()
+            if len(sentenceToken) > 20:
+                querytext = ER_pipeline.AbstractiveSummary(querytext, length_penalty) 
+            Image_Articles = ER_pipeline.ReverseImageSearch(querytext, input_image, topN)
+            print('Image_Articles :', Image_Articles)
+    
+            #if len(sentenceToken) > 20:
+            #    ocrtext = ER_pipeline.AbstractiveSummary(querytext, length_penalty)
+            Filtered_Articles = ER_pipeline.RetrieveArticles(querytext, topN)
+    
+            Filtered_Articles = Filtered_Articles + Image_Articles
+    
+            print(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
+            surebot_logger.info(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
+    
+            print(f'===== ARTICLES RETRIEVAL RESULTS =====')
+            surebot_logger.info(f'\n===== ARTICLES RETRIEVAL RESULTS =====')
+            print(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
+            surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
+    
+            output_message = ""
+            #output_message = "===== FACT CHECK RESULTS ====="
+            #output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
+            #output_message += "\nQuery Input: {}".format(query)
+    
+            if len(Filtered_Articles) == 0:
+                #output_message += 'NO MATCHING ARTICLES FOUND'
+                print(f'NO MATCHING ARTICLES FOUND')
+                surebot_logger.info(f'NO MATCHING ARTICLES FOUND')
             else:
-                final_score = 'REFUTES'
-                print(f'************** FINAL SCORE: REFUTES')
-                surebot_logger.info(f'************** FINAL SCORE: REFUTES')
-
-            output_message += "\n\n----- Total Articles Found: {} -----".format(len(Filtered_Articles))
-            #for i in range(len(Filtered_Articles)):
-            #    output_message += "\n\nURL {}".format(i+1)
-            #    output_message += '\n' + Filtered_Articles[i][2] + '\n*[Summary]* '
-            #    for j in range(len(Filtered_Articles[i][1])):
-            #        output_message += Filtered_Articles[i][1][j]
-            output_message += '\n\nFINAL SCORE: ' + final_score
+                # Run Fact Verification - Graph NET
+                graphNet = graphNetFC(cwd, device_cpu, feature_num, evidence_num, graph_layers,
+                                      num_class, graph_pool, sequence_length, surebot_logger)
+    
+                FactVerification_List = []
+                for i in range(len(Filtered_Articles)):
+                    pred_dict, outputs, heatmap = graphNet.predict(querytext, Filtered_Articles[i][1])
+    
+                    FactVerification_List.append(pred_dict['predicted_label'])
+                    print(pred_dict)
+                    surebot_logger.info(pred_dict)
+                    print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
+                    surebot_logger.info('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
+                    print((np.array(outputs.detach().cpu())))
+                    surebot_logger.info((np.array(outputs.detach().cpu())))
+    
+                    # Plot Attention Heat map to visualize
+                    # ax = sns.heatmap(heatmap, linewidth=1.0, cmap="YlGnBu")
+                    # plt.show()
+                    # plt.clf()
+    
+                maj_vote = 0
+                for i in range(len(Filtered_Articles)):
+                    print(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
+                    surebot_logger.info(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
+                    if FactVerification_List[i] == 'SUPPORTS':
+                        maj_vote += 1
+    
+                if (maj_vote / len(Filtered_Articles)) > 0.6:
+                    final_score = 'SUPPORTS'
+                    print(f'************** FINAL SCORE: SUPPORTS')
+                    surebot_logger.info(f'************** FINAL SCORE: SUPPORTS')
+                elif (maj_vote / len(Filtered_Articles)) == 0.5:
+                    final_score = 'NOT ENOUGH EVIDENCE'
+                    print(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
+                    surebot_logger.info(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
+                else:
+                    final_score = 'REFUTES'
+                    print(f'************** FINAL SCORE: REFUTES')
+                    surebot_logger.info(f'************** FINAL SCORE: REFUTES')
+    
+                #output_message += "\n\n----- Total Articles Found: {} -----".format(len(Filtered_Articles))
+                #for i in range(len(Filtered_Articles)):
+                #    output_message += "\n\nURL {}".format(i+1)
+                #    output_message += '\n' + Filtered_Articles[i][2] + '\n*[Summary]* '
+                #    for j in range(len(Filtered_Articles[i][1])):
+                #        output_message += Filtered_Articles[i][1][j]
+                #output_message += '\n\nFINAL SCORE: ' + final_score
 
     except Exception as e:
         if isinstance(e, SoftTimeLimitExceeded):
@@ -340,8 +355,10 @@ if __name__ == "__main__":
         cv2.imshow('Picture', img)
         cv2.waitKey(0)
         cv2.destroyAllWindows()
-        input_claim = detect_text(img_filepath)[0]
-        if (len(input_claim.split()) < 5):
+        input_claim = detect_text(img_filepath)
+        if input_claim == []:
+            input_claim = ''
+        if (len(input_claim[0].split()) < 5):
             input_claim = ''
         print(f'\n\nProcessing your claim......', file_name)
         surebot_logger.info(input_claim)
