@@ -84,19 +84,20 @@ def upload():
         input_claim = detect_text(filepath)[0]
         if (len(input_claim.split()) < 5):
             input_claim = ''
-        # rev_image, vb_outcome = executePipeline(input_claim, filepath, surebot_logger)
-        result, vb_outcome, rev_image = executePipeline(input_claim, filepath, surebot_logger)
+
+        result, vb_outcome = executePipeline(input_claim, filepath, surebot_logger)
         # result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
-        rev_image = rev_image.encode('utf-16', 'surrogatepass').decode('utf-16')
+        #rev_image = rev_image.encode('utf-16', 'surrogatepass').decode('utf-16')
               
 #         rev_image = "NO MATCHING ARTICLES"
 #         vb_outcome = "SUPPORT"
         img_doctoring = "REFUTES"
-        text_cls = "SUPPORT"
-        
+        text_cls = "SUPPORT"        
         final = "SUPPORT"
         
-    return render_template('image.html', filepath=filepath, vb_outcome=vb_outcome, rev_image=rev_image,img_doctoring=img_doctoring, text_cls=text_cls, final=final)    
+    return render_template('image.html', filepath=filepath, vb_outcome=vb_outcome,
+                            rev_image=result,img_doctoring=img_doctoring, 
+                            text_cls=text_cls, final=final)    
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)

@@ -216,11 +216,6 @@ def executePipeline(query, input_image, surebot_logger):
                     print((np.array(outputs.detach().cpu())))
                     surebot_logger.info((np.array(outputs.detach().cpu())))
     
-                    # Plot Attention Heat map to visualize
-                    # ax = sns.heatmap(heatmap, linewidth=1.0, cmap="YlGnBu")
-                    # plt.show()
-                    # plt.clf()
-    
                 maj_vote = 0
                 for i in range(len(Filtered_Articles)):
                     print(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
@@ -256,7 +251,7 @@ def executePipeline(query, input_image, surebot_logger):
             output_message = 'Exception occurred in pipeline'
             print(e)
     
-    return output_message, vb_outcome, final_score   #, final_score, len(Filtered_Articles)
+    return final_score, vb_outcome
 
 
 def remove_emoji(text):
@@ -322,22 +317,19 @@ def configure_logger(chat):
     if not os.path.exists(logDir):
         os.makedirs(logDir)
 
-    LogDir = logDir
     timing = time.asctime(time.localtime(time.time()))
     # logFile = logDir + '/' + timing.replace(' ','_') + '.log'
     logFile = logDir + '/chat_' + str(chat) + '.log'
     handler = logging.FileHandler(logFile)
-
     formatter = logging.Formatter('')
     handler.setFormatter(formatter)
     surebot_logger.addHandler(handler)
 
     return surebot_logger
 
+'''
+if __name__ == "__main__":
 
-# if __name__ == "__main__":
-
-<<<<<<< HEAD
     chat = 0
     surebot_logger = configure_logger(chat)
     custom_fig = Figlet(font='slant')
@@ -364,35 +356,6 @@ def configure_logger(chat):
         print(f'\n\nProcessing your claim......', file_name)
         surebot_logger.info(input_claim)
         result, vb_result = executePipeline(input_claim, img_filepath, surebot_logger)
-        #result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
         print('Reverse Image Search Results :', result)
         print('Visual Bert Comparison Results :', vb_result)
-=======
-#     chat = 0
-#     surebot_logger = configure_logger(chat)
-#     custom_fig = Figlet(font='slant')
-#     surebot_banner = custom_fig.renderText("SureBoTv2")
-#     print('\n')
-#     print(surebot_banner + "version 2.0\n")
-#     surebot_logger.info('\n')
-#     surebot_logger.info(surebot_banner + "version 2.0\n")
-#     picture_folder = '../images'
-#     while True:
-#         #print(f'\n\nSureBoT: Input a claim that you would like to fact-check!')
-#         surebot_logger.info(f'SureBoTv2: Input a picture (filename) that you will like to fact-check!')
-#         file_name = str(input("Filename: "))
-#         img_filepath = os.path.join(picture_folder, file_name)
-#         img = cv2.imread(img_filepath, cv2.IMREAD_ANYCOLOR)
-#         cv2.imshow('Picture', img)
-#         cv2.waitKey(0)
-#         cv2.destroyAllWindows()
-#         input_claim = detect_text(img_filepath)[0]
-#         if (len(input_claim.split()) < 5):
-#             input_claim = ''
-#         print(f'\n\nProcessing your claim......', file_name)
-#         surebot_logger.info(input_claim)
-#         result, vb_result = executePipeline(input_claim, img_filepath, surebot_logger)
-#         #result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
-#         print('Reverse Image Search Results :', result)
-#         print('Visual Bert Comparison Results :', vb_result)
->>>>>>> 4f58711004ecb696bb71389e0622a660c8a3fa10
+'''
