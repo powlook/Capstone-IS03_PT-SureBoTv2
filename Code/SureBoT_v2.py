@@ -256,7 +256,7 @@ def executePipeline(query, input_image, surebot_logger):
             output_message = 'Exception occurred in pipeline'
             print(e)
     
-    return final_score, vb_outcome, final_score   #, final_score, len(Filtered_Articles)
+    return output_message, vb_outcome, final_score   #, final_score, len(Filtered_Articles)
 
 
 def remove_emoji(text):

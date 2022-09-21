@@ -81,12 +81,12 @@ def upload():
         
         ############## Insert the codes to call out the different models ####################################
         ######### Return the results for the different models and replace the variables below ###############
-       input_claim = detect_text(filepath)[0]
+        input_claim = detect_text(filepath)[0]
         if (len(input_claim.split()) < 5):
             input_claim = ''
         # rev_image, vb_outcome = executePipeline(input_claim, filepath, surebot_logger)
         result, vb_outcome, rev_image = executePipeline(input_claim, filepath, surebot_logger)
-        result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
+        # result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
         rev_image = rev_image.encode('utf-16', 'surrogatepass').decode('utf-16')
               
 #         rev_image = "NO MATCHING ARTICLES"

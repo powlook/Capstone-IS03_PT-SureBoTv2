@@ -1,1 +1,1 @@
-** Replace detectron2 folder with the downloaded detectron2 folder from Google Drive**
+Replace folder with detectron2 downloaded from Google Drive Link
