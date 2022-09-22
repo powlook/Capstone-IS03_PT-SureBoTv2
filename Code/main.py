@@ -85,19 +85,29 @@ def upload():
         if (len(input_claim.split()) < 5):
             input_claim = ''
 
-        result, vb_outcome = executePipeline(input_claim, filepath, surebot_logger)
+        result, vb_outcome, text_cls = executePipeline(input_claim, filepath, surebot_logger)
         # result = result.encode('utf-16', 'surrogatepass').decode('utf-16')
         #rev_image = rev_image.encode('utf-16', 'surrogatepass').decode('utf-16')
               
 #         rev_image = "NO MATCHING ARTICLES"
-#         vb_outcome = "SUPPORT"
-        img_doctoring = "REFUTES"
-        text_cls = "SUPPORT"        
-        final = "SUPPORT"
+#         vb_outcome = "SUPPORTS"
+        img_doctoring = "TO BE FURTHER EDITED"
+        # text_cls = "SUPPORTS"
+
+        all_scores = [result, vb_outcome, text_cls, img_doctoring]
+        for score in all_scores:
+            support = 0
+            refute = 0
+            if "SUPPORTS" in score:
+                support += 1
+            elif "REFUTES" in score:
+                refute += 1
+                
+        final_score = "TO BE FURTHER EDITED"
         
     return render_template('image.html', filepath=filepath, vb_outcome=vb_outcome,
                             rev_image=result,img_doctoring=img_doctoring, 
-                            text_cls=text_cls, final=final)    
+                            text_cls=text_cls, final=final_score)    
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)

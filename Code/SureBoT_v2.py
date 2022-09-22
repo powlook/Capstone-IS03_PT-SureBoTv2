@@ -37,6 +37,7 @@ from QueryImage import *
 from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
 from VBInference import vb_inference
+from text_classifier import text_classification
 
 warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -147,6 +148,7 @@ def executePipeline(query, input_image, surebot_logger):
         if query == '':
             vb_outcome = 'NO RELEVANT OCR_TEXT DETECTED'
             final_score =  'NO RELEVANT OCR_TEXT DETECTED'
+            text_cls = 'NO RELEVANT OCR_TEXT DETECTED'
             
         else:
             # Query Preprocessing
@@ -160,6 +162,7 @@ def executePipeline(query, input_image, surebot_logger):
                 sentenceToken.append(token.text)
 
             vb_outcome = vb_inference(input_image, querytext)
+            text_cls = text_classification(querytext)
 
             print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
             surebot_logger.info(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
@@ -251,7 +254,7 @@ def executePipeline(query, input_image, surebot_logger):
             output_message = 'Exception occurred in pipeline'
             print(e)
     
-    return final_score, vb_outcome
+    return final_score, vb_outcome, text_cls
 
 
 def remove_emoji(text):
