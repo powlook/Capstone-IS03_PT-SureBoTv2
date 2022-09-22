@@ -103,7 +103,7 @@ Enter folder and create a new environment to sandbox your developmental workspac
 ```
 cd Code
 py -3.7 -m venv "YOUR_ENV_NAME"
-"YOUT_ENV_NAME"/Scripts/activate
+"YOUT_ENV_NAME"\Scripts\activate
 ```
 **Step 3: Install torch dependencies**
 
