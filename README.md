@@ -72,6 +72,7 @@ pipeline_models/models/bart-large-cnn
 	
 pipeline_models/trained_models
 	finalized_model.pkl
+	model_roberta_base.pth
 ```
 **Step 5: Download Spacy Model**
 
@@ -133,6 +134,7 @@ pipeline_models/models/bart-large-cnn
 	
 pipeline_models/trained_models
 	finalized_model.pkl
+	model_roberta_base.pth
 ```
 
 **Step 5: Download Detectron Model**
