@@ -6,6 +6,8 @@ from torch.optim import AdamW
 import numpy as np
 import datetime
 import warnings
+from transformers import logging
+logging.set_verbosity_warning()
 
 warnings.filterwarnings('ignore')
 
@@ -31,10 +33,10 @@ def flat_accuracy(preds, labels):
 
 ####################################################################
 
-def text_classification(input_text):
-    print("\n******* TEXT CLASSIFIER LOADED *******")
-    device = torch.device("cpu")
-    model_name = "roberta"     # bert / distilbert / roberta
+def text_model():
+    # print("\n******* TEXT CLASSIFIER MODEL LOADED *******")
+    # device = torch.device("cpu")
+    # model_name = "roberta"     # bert / distilbert / roberta
 
 ##    if model_name == "bert":
 ##        #print('Loading Bert tokenizer...')
@@ -80,10 +82,12 @@ def text_classification(input_text):
     checkpoint = torch.load(output_file, map_location='cpu')
     model.load_state_dict(checkpoint['model_state_dict'])
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    
+    return model, tokenizer
 
     ################ Evaluation ###################
 
-
+def text_classification(input_text, model, tokenizer):
     # # Tokenize all of the sentences and map the tokens to thier word IDs.
     input_ids = []
     attention_masks = []

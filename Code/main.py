@@ -7,9 +7,13 @@ from PIL import Image
 import torch
 from transformers import AutoModel
 import torch.nn as nn
-import warnings
+# import warnings
+from text_classifier import text_model
+from VBInference import vb_model
+from transformers import logging
+logging.set_verbosity_warning()
 
-warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -20,7 +24,7 @@ surebot_logger = configure_logger(chat)
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "upload")
-print("SureBoT is waking up..... Please give it a few minutes....")
+# print("SureBoT is waking up..... Please give it a few minutes....")
 print("* Running on http://localhost:5000/ (Press CTRL+C to quit)")
 
 class Classifier(nn.Module):
@@ -60,6 +64,8 @@ class Classifier(nn.Module):
         
         return x
 
+txt_model, txt_tokenizer = text_model()
+visualbert_model = vb_model()
 
 ############# Website Configuration #########################################
 @app.route('/')
@@ -86,10 +92,10 @@ def upload():
             input_claim = '0'
         if (len(input_claim[0].split()) < 5):
             input_claim = ''
-
-        result, vb_outcome, text_cls = executePipeline(input_claim, filepath, surebot_logger)
+        
+        result, vb_outcome, text_cls = executePipeline(input_claim, filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model)
               
-        img_doctoring = "TO BE FURTHER EDITED"
+        # img_doctoring = "TO BE FURTHER EDITED"
 
         all_scores = [result, vb_outcome, text_cls] #, img_doctoring]
         support, refute = 0, 0
@@ -106,8 +112,7 @@ def upload():
             final_score = "CANNOT BE DETERMINED"
         
     return render_template('image.html', filepath=filepath, vb_outcome=vb_outcome,
-                            rev_image=result,img_doctoring=img_doctoring, 
-                            text_cls=text_cls, final=final_score)    
+                            result=result, text_cls=text_cls, final=final_score)    
 
 if __name__ == '__main__':
     app.run(host='localhost', port=5000, debug=True)

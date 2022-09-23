@@ -60,12 +60,20 @@ class Classifier(nn.Module):
         return x
 
 ########################## Main ###############################
-
-def vb_inference(img_path, text):
-
+def vb_model():
+    # print("****** VISUALBERT MODEL LOADED ******")
     device = "cpu"
     model_file = 'pipeline_models/trained_model/finalized_model.pkl'
     model_file = os.path.join(os.getcwd(), model_file)
+    loaded_model = pickle.load(open(model_file, 'rb')).to(device)
+    
+    return loaded_model
+
+def vb_inference(img_path, text, loaded_model):
+
+    device = "cpu"
+    # model_file = 'pipeline_models/trained_model/finalized_model.pkl'
+    # model_file = os.path.join(os.getcwd(), model_file)
 
     img_bgrlist = img2bgr(img_path)
     visual_embeds = img_visual_embeds(img_bgrlist, device)
@@ -81,7 +89,7 @@ def vb_inference(img_path, text):
     visual_token_type_ids = torch.ones(visual_embeds.shape[:-1], dtype=torch.long).to(device)
 
     ###### Load model
-    loaded_model = pickle.load(open(model_file, 'rb')).to(device)
+    # loaded_model = pickle.load(open(model_file, 'rb')).to(device)
     #print(f"summary of model: {summary(loaded_model)}")
     predicted_class = np.nan
     outcome = {0:'REFUTES', 1:'SUPPORTS'}
@@ -94,21 +102,21 @@ def vb_inference(img_path, text):
     
     return outcome[predicted_class]
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
 
-    ###################### Parameters #############################
-    #img_name = "0002.jpg"
-    picture_folder = "D:/Capstone/surebot/images"
-    text_file = pd.read_excel('ocr_text_220818.xlsx')
-    select_image = 19
-    img_name = text_file['filename'][select_image]
-    text = text_file['ocr_text'][select_image]
-    img_path = os.path.join(os.getcwd(), picture_folder, img_name)
-    print(img_path)
-    #text = "NATIONAL CENTRE FOR INFECTIOUS DISEASES The 42-year-old British man, who works as a flight attendant, is currently warded at NCID. The Straits Times"
-    #text= "Fire breaks out at Kusu Island hilltop with 3 Malay shrines DEM WAKEY FFOR A fire yesterday engulfed a hilltop on Kusu Island where three Malay keramats or shrines are located. A group of campers on nearby Lazarus Island said they heard a loud explosion, followed by a few smaller ones, when the blaze started at about 6.20pm. The Singapore Civil Defence Force said it put out the fire with two water jets within an hour after it arrived. There were no reported injuries. "
-    ###############################################################
+#     ###################### Parameters #############################
+#     #img_name = "0002.jpg"
+#     picture_folder = "D:/Capstone/surebot/images"
+#     text_file = pd.read_excel('ocr_text_220818.xlsx')
+#     select_image = 19
+#     img_name = text_file['filename'][select_image]
+#     text = text_file['ocr_text'][select_image]
+#     img_path = os.path.join(os.getcwd(), picture_folder, img_name)
+#     print(img_path)
+#     #text = "NATIONAL CENTRE FOR INFECTIOUS DISEASES The 42-year-old British man, who works as a flight attendant, is currently warded at NCID. The Straits Times"
+#     #text= "Fire breaks out at Kusu Island hilltop with 3 Malay shrines DEM WAKEY FFOR A fire yesterday engulfed a hilltop on Kusu Island where three Malay keramats or shrines are located. A group of campers on nearby Lazarus Island said they heard a loud explosion, followed by a few smaller ones, when the blaze started at about 6.20pm. The Singapore Civil Defence Force said it put out the fire with two water jets within an hour after it arrived. There were no reported injuries. "
+#     ###############################################################
     
-    for i in range(5):
-        result = vb_inference(img_path, text)
-        print(result)
+#     for i in range(5):
+#         result = vb_inference(img_path, text)
+#         print(result)

@@ -101,7 +101,7 @@ class Classifier(nn.Module):
         return x
 
 
-def executePipeline(query, input_image, surebot_logger):
+def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer, visualbert_model):
     #####################################################
     # Initialization
     #####################################################
@@ -163,8 +163,8 @@ def executePipeline(query, input_image, surebot_logger):
                 sentenceToken.append(token.text)
 
             print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
-            vb_outcome = vb_inference(input_image, querytext)
-            text_cls = text_classification(querytext)
+            vb_outcome = vb_inference(input_image, querytext, visualbert_model)
+            text_cls = text_classification(querytext, txt_model, txt_tokenizer)
 
             # If tokens > 50 - Perform Abstractive Summary on Query
             # Else just skip and perform Doc Retrieval
