@@ -3,40 +3,28 @@
      <form action="/image">
       <header>
         <div class="container">
-        <h1 style="font-family: Arial;" class="logo" id="Title">SureBoTv2</h1>
+        <h1 style="font-family: Arial; text-align:center" class="logo" id="Title">SureBoTv2</h1>
         </div>
         <div id="content">
           <img src="static/logo.png" class ="ribbon"/>
         </div>
       </header>
-
-      <style>
-        #content {
-            position: relative;
-        }
-        #content img {
-            position: absolute;
-            top: 0px;
-            right: 0px;
-            height: 300px;
-        }
-      </style>
     </form>
 
-    <img src="{{ filepath }}" height=400/>
+    <img src="{{ filepath }}" height=600 class="center"/>
     <br><br>
 
     <form action="/">
-      <input type="submit" value= "Back to Home Page" />
+      <input type="submit" value= "Back to Home Page" class="center" />
     </form>
 
 
-    <h3 style="font-family:verdana;">Joint Visual-Linguistics Modelling : {{ vb_outcome }}</h3>
-    <h3 style="font-family:verdana;">External Knowledge Retrieval : {{ result }}</h3>
-    <h3 style="font-family:verdana;">Image Doctoring Detection : {{ img_doctoring }}</h3>
-    <h3 style="font-family:verdana;">Text Classification : {{ text_cls }}</h3>
+    <h3 style="font-family:verdana; text-align:center" >Joint Visual-Linguistics Modelling : {{ vb_outcome }}</h3>
+    <h3 style="font-family:verdana; text-align:center">External Knowledge Retrieval : {{ result }}</h3>
+    <!-- <h3 style="font-family:verdana;">Image Doctoring Detection : {{ img_doctoring }}</h3> -->
+    <h3 style="font-family:verdana; text-align:center">Text Classification : {{ text_cls }}</h3>
     <br>
-    <h2 style="font-family:verdana;">Final Outcome ---------------------- : {{ final }}</h2>
+    <h2 style="font-family:verdana; text-align:center">Final Outcome ---------------------- : {{ final }}</h2>
     
 
     <!-- <hr style="height:4px;border:none;color:#333;background-color:#333;">
@@ -51,3 +39,21 @@
 
    </body>
 </html>
+
+<style>
+  #content {
+      position: relative;
+  }
+  #content img {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      height: 300px;
+  }
+
+  .center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+</style>

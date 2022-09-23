@@ -8,11 +8,12 @@
           </div>
         </header>
       </form>
-      <h2 style="text-align:center">00:00</h2>
+
       <script src="script.js"></script>
 
       <h2 style="text-align:center" id="original">Please upload an image that you would like to check.</h2>
       <h2 style="text-align:center" id="processing">Processing..... Allow few minutes for SureBoT to verify.....</h2>
+      <h2 style="text-align:center" id="timer" ><label id="minutes">00</label>:<label id="seconds">00</label></h2>
 
       <h3 style="text-align:center">
         <div id="image_input">
@@ -40,12 +41,37 @@
 
         var y = document.getElementById("processing");
         y.style.display = "none"
+
+        var z = document.getElementById("timer");
+        z.style.display = "none"
         
         function myFunc1() {
           var x = document.getElementById("original");
           var y = document.getElementById("processing");
+          var z = document.getElementById("timer");
           x.style.display = "none";
           y.style.display = "block"
+          z.style.display = "block"
+        }
+
+        var minutesLabel = document.getElementById("minutes");
+        var secondsLabel = document.getElementById("seconds");
+        var totalSeconds = 0;
+        setInterval(setTime, 1000);
+
+        function setTime() {
+          ++totalSeconds;
+          secondsLabel.innerHTML = pad(totalSeconds % 60);
+          minutesLabel.innerHTML = pad(parseInt(totalSeconds / 60));
+        }
+
+        function pad(val) {
+          var valString = val + "";
+          if (valString.length < 2) {
+            return "0" + valString;
+          } else {
+            return valString;
+          }
         }
 
       </script>
