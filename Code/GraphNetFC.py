@@ -68,16 +68,16 @@ class graphNetFC(object):
         self.device = device
         self.logger = loggerHandle
 
-        print(f'LOADING BERT PRETRAINED . . .')
-        self.logger.info(f'LOADING BERT PRETRAINED . . .')
+        print('LOADING BERT PRETRAINED . . .')
+        self.logger.info('LOADING BERT PRETRAINED . . .')
         # Load BERT pretrained
         self.tokenizer = BertTokenizer.from_pretrained(self.filepath + '/pipeline_models/pretrained_models/BERT-Pair/', do_lower_case=True)
         self.BERTmodel = BertModel.from_pretrained(self.filepath + '/pipeline_models/pretrained_models/BERT-Pair/')
         self.BERTmodel.to(self.device)
         self.BERTmodel.eval()
 
-        print(f'LOADING GEAR PRETRAINED . . .')
-        self.logger.info(f'LOADING GEAR PRETRAINED . . .')
+        print('LOADING GEAR PRETRAINED . . .')
+        #self.logger.info(f'LOADING GEAR PRETRAINED . . .')
         self.GEAR_model = self.filepath + '/pipeline_models/models/2layerbest.pth.tar'
         # self.BERT_pretrainedMODEL = BERTpretrained_model
         # self.GEAR_model = GEAR_model
@@ -165,8 +165,8 @@ class graphNetFC(object):
                 print(f'*** SENTENCE {ex_index} ***')
                 print("tokens: %s" % " ".join([str(x) for x in tokens]))
                 # print("input_ids: %s" % " ".join([str(x) for x in input_ids]))
-                self.logger.info(f'*** SENTENCE {ex_index} ***')
-                self.logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
+                #self.logger.info(f'*** SENTENCE {ex_index} ***')
+                #self.logger.info("tokens: %s" % " ".join([str(x) for x in tokens]))
                 # self.logger.info("input_ids: %s" % " ".join([str(x) for x in input_ids]))
                 # print("input_mask: %s" % " ".join([str(x) for x in input_mask]))
                 # print("input_type_ids: %s" % " ".join([str(x) for x in input_type_ids]))
@@ -268,8 +268,8 @@ class graphNetFC(object):
 
         # 9. Load GraphNet pretrained checkpoint for prediction
         test_features, test_claims = load_bert_features_claim_inference(instances)
-        print(f'***** ATTENTION WEIGHTS *****')
-        self.logger.info(f'***** ATTENTION WEIGHTS *****')
+        print('***** ATTENTION WEIGHTS *****')
+        #self.logger.info(f'***** ATTENTION WEIGHTS *****')
         graphNet_model= GEAR(nfeat=self.feature_num, nins=self.evidence_num, nclass=self.num_class, 
                                     nlayer=self.graph_layers, pool=self.graph_pool, 
                                     device=self.device, loggerhandle=self.logger)
@@ -289,7 +289,7 @@ class graphNetFC(object):
         answer = {}
         answer["predicted_label"] = self.get_predicted_label(outputs.detach().cpu())
         print(f'>>>>>>> TIME TAKEN - GraphNET: {time.time()- start_time}')
-        self.logger.info(f'>>>>>>> TIME TAKEN - GraphNET: {time.time()- start_time}')
+        #self.logger.info(f'>>>>>>> TIME TAKEN - GraphNET: {time.time()- start_time}')
 
         return answer, outputs, heatmap
 

@@ -19,7 +19,7 @@ retrieve top relevant articles
 
 """
 import logging, warnings
-import requests, time, os
+import requests, time, os, re
 import numpy as np
 import pandas as pd
 import validators
@@ -53,15 +53,15 @@ class EvidenceRetrieval(object):
 
         # Load Models
         start_time = time.time()
-        print(f'LOADING PEGASUS MODEL . . .')
-        self.logger.info(f'LOADING PEGASUS MODEL . . .')
+        print('LOADING PEGASUS MODEL . . .')
+        #self.logger.info(f'LOADING PEGASUS MODEL . . .')
         PegasusModel_dir = self.filepath + '/pipeline_models/models/pegasus-cnn_dailymail'
         self.PegasusTokenizer = PegasusTokenizer.from_pretrained(PegasusModel_dir)
         self.PegasusModel = PegasusForConditionalGeneration.from_pretrained(PegasusModel_dir).to(self.device)
         print('\n*******PEGASUS TOKENIZER AND MODEL LOADED*******')
-        print(f'LOADING SENTENCE-BERT MODEL . . .')
-        self.logger.info('\n*******PEGASUS TOKENIZER AND MODEL LOADED*******')
-        self.logger.info(f'LOADING SENTENCE-BERT MODEL . . .')
+        print('LOADING SENTENCE-BERT MODEL . . .')
+        #self.logger.info('\n*******PEGASUS TOKENIZER AND MODEL LOADED*******')
+        #self.logger.info(f'LOADING SENTENCE-BERT MODEL . . .')
         # SentenceModel_dir = self.filepath + '/pipeline_models/models/stsb-distilbert-base'
         SentenceModel_dir = self.filepath + '/pipeline_models/models/msmarco-distilroberta-base-v2'
         self.sentenceTokenizer = AutoTokenizer.from_pretrained(SentenceModel_dir)
@@ -79,14 +79,14 @@ class EvidenceRetrieval(object):
         translated = self.PegasusModel.generate(**batch, length_penalty=length_penalty)
         summary = self.PegasusTokenizer.batch_decode(translated, skip_special_tokens=True)
         print('**********ABSTRACTIVE SUMMARY*************')
-        self.logger.info('*********ABSTRACTIVE SUMMARY************')
+        #self.logger.info('*********ABSTRACTIVE SUMMARY************')
         summary = "".join(summary)
         print(summary)
-        self.logger.info(summary)
+        #self.logger.info(summary)
         print(f'>>>>>>> TIME TAKEN : {time.time() - start_time}')
         print('*********************************************')
-        self.logger.info(f'>>>>>>> TIME TAKEN : {time.time() - start_time}')
-        self.logger.info('******************************************')
+        #self.logger.info(f'>>>>>>> TIME TAKEN : {time.time() - start_time}')
+        #self.logger.info('******************************************')
         return summary
 
     def ReverseImageSearch(self, input_text, image_filepath, topN):
@@ -140,7 +140,7 @@ class EvidenceRetrieval(object):
             similaritylist.append(similarityscore.detach().cpu().numpy())
 
         print(f'SIMILARITY LIST SCORES: {similaritylist}')
-        self.logger.info(f'SIMILARITY LIST SCORES: {similaritylist}')
+        #self.logger.info(f'SIMILARITY LIST SCORES: {similaritylist}')
 
         articlesimilarity = [list(x) for x in zip(np.array(similaritylist), articlesummarylist, articleurls)]
         filtered_articles = [[article[0], article[1].split(sep="<n>"), article[2]]
@@ -161,12 +161,12 @@ class EvidenceRetrieval(object):
             articleurls.append(article_info[-1]["href"])
         print('\n******* Search Articles through Google News *******')
         print(f'\n******* Found No. of articles = {len(articleurls)} *******')
-        self.logger.info(f'\n******* Found No. of articles = {len(articleurls)} *******')
+        #self.logger.info(f'\n******* Found No. of articles = {len(articleurls)} *******')
 
         # Summarize the article (take TopN where N is number of articles)
         for article_url in articleurls[:topN]:
             try:
-                print("article_url :", article_url)
+                #print("article_url :", article_url)
                 article_text = fulltext(requests.get(article_url, headers=self.headers).text)
                 # ************************#
                 # RUN PEGASUS
@@ -195,7 +195,7 @@ class EvidenceRetrieval(object):
             similaritylist.append(similarityscore.detach().cpu().numpy())
 
         print(f'SIMILARITY LIST SCORES: {similaritylist}')
-        self.logger.info(f'SIMILARITY LIST SCORES: {similaritylist}')
+        #self.logger.info(f'SIMILARITY LIST SCORES: {similaritylist}')
 
         #####################################################
         # Filter Relevant Articles - Distance Threshold > 0.4
@@ -205,11 +205,11 @@ class EvidenceRetrieval(object):
                             for article in articlesimilarity if article[0] > dist_thres]
 
         pprint(filteredarticles)
-        self.logger.info(filteredarticles)
+        #self.logger.info(filteredarticles)
 
         # Output to excel/csv file [Optional]
-        # df = pd.DataFrame(filteredarticles, columns=["Score", "Summarized Content", "URL"])
-        # df.to_excel(self.filepath + "/Output.xlsx", sheet_name="Query")
+        df = pd.DataFrame(filteredarticles, columns=["Score", "Summarized Content", "URL"])
+        df.to_excel(self.filepath + "/Output.xlsx", sheet_name="Query")
 
         return filteredarticles
 

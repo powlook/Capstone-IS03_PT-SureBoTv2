@@ -21,18 +21,18 @@ import requests, time, os, re, io, cv2
 import logging, warnings
 import emoji
 import validators
-import torch
 import numpy as np
 import pandas as pd
 from pyfiglet import Figlet
 from newspaper import fulltext
 from spacy.lang.en import English
 from celery.exceptions import SoftTimeLimitExceeded
+import torch
 import torch.nn as nn
 from torchinfo import summary
 from transformers import AutoModel   #BertTokenizer, 
 
-from text_processing import *
+from text_processing import process_ocr, process_text
 from QueryImage import *
 from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
@@ -107,12 +107,12 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
     #####################################################
     try:
         print(f'DEVICE Used : {device}')
-        surebot_logger.info(f'\n=============== NEW QUERY ===============')
-        surebot_logger.info(f'DEVICE Used : {device}')
+        #surebot_logger.info(f'\n=============== NEW QUERY ===============')
+        #surebot_logger.info(f'DEVICE Used : {device}')
         start = time.time()
         cwd = os.path.dirname(os.path.realpath(__file__))
         print(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
-        surebot_logger.info(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
+        #surebot_logger.info(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
         ER_pipeline = EvidenceRetrieval(cwd, device, surebot_logger)
         query_image = QueryImage(cwd)
         final_score = 'NO MATCHING ARTICLES FOUND'
@@ -184,14 +184,14 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
             Filtered_Articles = Filtered_Articles + Image_Articles
     
             print(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
-            surebot_logger.info(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
+            #surebot_logger.info(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
     
             print(f'===== ARTICLES RETRIEVAL RESULTS =====')
-            surebot_logger.info(f'\n===== ARTICLES RETRIEVAL RESULTS =====')
+            #surebot_logger.info(f'\n===== ARTICLES RETRIEVAL RESULTS =====')
             print(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
-            surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
+            #surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
     
-            output_message = ""
+            #output_message = ""
             #output_message = "===== FACT CHECK RESULTS ====="
             #output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
             #output_message += "\nQuery Input: {}".format(query)
@@ -199,7 +199,7 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
             if len(Filtered_Articles) == 0:
                 #output_message += 'NO MATCHING ARTICLES FOUND'
                 print(f'NO MATCHING ARTICLES FOUND')
-                surebot_logger.info(f'NO MATCHING ARTICLES FOUND')
+                #surebot_logger.info(f'NO MATCHING ARTICLES FOUND')
             else:
                 # Run Fact Verification - Graph NET
                 graphNet = graphNetFC(cwd, device_cpu, feature_num, evidence_num, graph_layers,
@@ -220,36 +220,28 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
                 maj_vote = 0
                 for i in range(len(Filtered_Articles)):
                     print(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
-                    surebot_logger.info(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
+                    #surebot_logger.info(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
                     if FactVerification_List[i] == 'SUPPORTS':
                         maj_vote += 1
     
                 if (maj_vote / len(Filtered_Articles)) > 0.6:
                     final_score = 'SUPPORTS'
-                    print(f'************** FINAL SCORE: SUPPORTS')
-                    surebot_logger.info(f'************** FINAL SCORE: SUPPORTS')
+                    print('************** FINAL SCORE: SUPPORTS')
+                    #surebot_logger.info(f'************** FINAL SCORE: SUPPORTS')
                 elif (maj_vote / len(Filtered_Articles)) == 0.5:
                     final_score = 'NOT ENOUGH EVIDENCE'
-                    print(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
-                    surebot_logger.info(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
+                    print('************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
+                    #surebot_logger.info(f'************** FINAL SCORE: NOT ENOUGH SUPPORTING EVIDENCE')
                 else:
                     final_score = 'REFUTES'
-                    print(f'************** FINAL SCORE: REFUTES')
-                    surebot_logger.info(f'************** FINAL SCORE: REFUTES')
-    
-                #output_message += "\n\n----- Total Articles Found: {} -----".format(len(Filtered_Articles))
-                #for i in range(len(Filtered_Articles)):
-                #    output_message += "\n\nURL {}".format(i+1)
-                #    output_message += '\n' + Filtered_Articles[i][2] + '\n*[Summary]* '
-                #    for j in range(len(Filtered_Articles[i][1])):
-                #        output_message += Filtered_Articles[i][1][j]
-                #output_message += '\n\nFINAL SCORE: ' + final_score
+                    print('************** FINAL SCORE: REFUTES')
+                    #surebot_logger.info(f'************** FINAL SCORE: REFUTES')
 
     except Exception as e:
         if isinstance(e, SoftTimeLimitExceeded):
             raise
         else:
-            output_message = 'Exception occurred in pipeline'
+            #output_message = 'Exception occurred in pipeline'
             print('Error Type :', e)
     
     return final_score, vb_outcome, text_cls
@@ -319,7 +311,6 @@ def configure_logger(chat):
         os.makedirs(logDir)
 
     timing = time.asctime(time.localtime(time.time()))
-    # logFile = logDir + '/' + timing.replace(' ','_') + '.log'
     logFile = logDir + '/chat_' + str(chat) + '.log'
     handler = logging.FileHandler(logFile)
     formatter = logging.Formatter('')
