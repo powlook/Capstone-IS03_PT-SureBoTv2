@@ -1,7 +1,7 @@
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification 
-from transformers import BertTokenizer, BertForSequenceClassification
-from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
+#from transformers import BertTokenizer, BertForSequenceClassification
+#from transformers import DistilBertTokenizer, DistilBertForSequenceClassification
 from torch.optim import AdamW
 import numpy as np
 import datetime
@@ -32,7 +32,7 @@ def flat_accuracy(preds, labels):
 ####################################################################
 
 def text_classification(input_text):
-    print("******* TEXT CLASSIFIER LOADED *******")
+    print("\n******* TEXT CLASSIFIER LOADED *******")
     device = torch.device("cpu")
     model_name = "roberta"     # bert / distilbert / roberta
 

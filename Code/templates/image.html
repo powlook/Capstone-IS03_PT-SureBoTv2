@@ -3,7 +3,7 @@
      <form action="/image">
       <header>
         <div class="container">
-        <h1 class="logo" id="Title">SureBoT</h1>
+        <h1 style="font-family: Arial;" class="logo" id="Title">SureBoTv2</h1>
         </div>
         <div id="content">
           <img src="static/logo.png" class ="ribbon"/>
@@ -30,14 +30,13 @@
       <input type="submit" value= "Back to Home Page" />
     </form>
 
-    <h3>External Image Retrieval: {{ rev_image }}</h3>
-    <h3>Joint Visual-Linguistics Modelling: {{ vb_outcome }}</h3>
-    <h3>Image Doctoring Detection: {{ img_doctoring }}</h3>
-    <h3>Text Classification: {{ text_cls }}</h3>
 
+    <h3 style="font-family:verdana;">Joint Visual-Linguistics Modelling : {{ vb_outcome }}</h3>
+    <h3 style="font-family:verdana;">External Knowledge Retrieval : {{ result }}</h3>
+    <h3 style="font-family:verdana;">Image Doctoring Detection : {{ img_doctoring }}</h3>
+    <h3 style="font-family:verdana;">Text Classification : {{ text_cls }}</h3>
     <br>
-    <br>
-    <h3>Final Outcome: {{ final }}</h3>
+    <h2 style="font-family:verdana;">Final Outcome ---------------------- : {{ final }}</h2>
     
 
     <!-- <hr style="height:4px;border:none;color:#333;background-color:#333;">

@@ -5,6 +5,8 @@ import torch, random
 import torch.nn as nn
 from torchinfo import summary
 from transformers import BertTokenizer, AutoModel
+from transformers import logging
+logging.set_verbosity_warning()
 
 from embedding_utils.text_embeddings import new_sumtext
 from embedding_utils.visual_embeddings import img_visual_embeds, img2bgr

@@ -30,7 +30,7 @@ from spacy.lang.en import English
 from celery.exceptions import SoftTimeLimitExceeded
 import torch.nn as nn
 from torchinfo import summary
-from transformers import BertTokenizer, AutoModel
+from transformers import AutoModel   #BertTokenizer, 
 
 from text_processing import *
 from QueryImage import *
@@ -116,15 +116,17 @@ def executePipeline(query, input_image, surebot_logger):
         ER_pipeline = EvidenceRetrieval(cwd, device, surebot_logger)
         query_image = QueryImage(cwd)
         final_score = 'NO MATCHING ARTICLES FOUND'
+        vb_outcome, text_cls = 'NONE', 'NONE'
         Filtered_Articles, Image_Articles = [], []
         word_count, matching_title = [], []
 
         # Get title from web-pages if ocr_text is []
         # We will accept a title for the image search if the length
         # of the title is > 10 words
-
+        #print('query :', query)
         if query == '':
-            print('\n*******GET TITLES OF WEB PAGES FOR TEXT EXTRACTION*******')
+            print('\n*******UNABLE TO EXTRACT MEANINGFUL TEXT FROM IMAGES*******')
+            print('*******TO GET TITLES OF WEB PAGES FOR TEXT EXTRACTION*******')
             _, match = query_image.detect_web(input_image)
 
             for i, item in enumerate(match):
@@ -147,27 +149,23 @@ def executePipeline(query, input_image, surebot_logger):
         querytext = ''
         if query == '':
             vb_outcome = 'NO RELEVANT OCR_TEXT DETECTED'
-            final_score =  'NO RELEVANT OCR_TEXT DETECTED'
-            text_cls = 'NO RELEVANT OCR_TEXT DETECTED'
-            
+            final_score = 'NO RELEVANT OCR_TEXT DETECTED'
+            text_cls = 'NO RELEVANT OCR_TEXT DETECTED'           
         else:
             # Query Preprocessing
             #querytext = query_preprocessing(query, surebot_logger)
             querytext = query[0]
-            
+            #print('querytext :', querytext)
             # Use SPACY to get number of tokens
             nlp = English()
             myDoc = nlp(querytext)
             for token in myDoc:
                 sentenceToken.append(token.text)
 
+            print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
             vb_outcome = vb_inference(input_image, querytext)
             text_cls = text_classification(querytext)
 
-            print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
-            surebot_logger.info(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
-            surebot_logger.info(sentenceToken)
-    
             # If tokens > 50 - Perform Abstractive Summary on Query
             # Else just skip and perform Doc Retrieval
     
@@ -213,11 +211,11 @@ def executePipeline(query, input_image, surebot_logger):
     
                     FactVerification_List.append(pred_dict['predicted_label'])
                     print(pred_dict)
-                    surebot_logger.info(pred_dict)
+                    #surebot_logger.info(pred_dict)
                     print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
-                    surebot_logger.info('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
-                    print((np.array(outputs.detach().cpu())))
-                    surebot_logger.info((np.array(outputs.detach().cpu())))
+                    #surebot_logger.info('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
+                    #print((np.array(outputs.detach().cpu())))
+                    #surebot_logger.info((np.array(outputs.detach().cpu())))
     
                 maj_vote = 0
                 for i in range(len(Filtered_Articles)):
@@ -252,7 +250,7 @@ def executePipeline(query, input_image, surebot_logger):
             raise
         else:
             output_message = 'Exception occurred in pipeline'
-            print(e)
+            print('Error Type :', e)
     
     return final_score, vb_outcome, text_cls
 
@@ -330,7 +328,7 @@ def configure_logger(chat):
 
     return surebot_logger
 
-'''
+
 if __name__ == "__main__":
 
     chat = 0
@@ -344,7 +342,7 @@ if __name__ == "__main__":
     picture_folder = '../images'
     while True:
         #print(f'\n\nSureBoT: Input a claim that you would like to fact-check!')
-        surebot_logger.info(f'SureBoTv2: Input a picture (filename) that you will like to fact-check!')
+        #surebot_logger.info(f'SureBoTv2: Input a picture (filename) that you will like to fact-check!')
         file_name = str(input("Filename: "))
         img_filepath = os.path.join(picture_folder, file_name)
         img = cv2.imread(img_filepath, cv2.IMREAD_ANYCOLOR)
@@ -352,13 +350,15 @@ if __name__ == "__main__":
         cv2.waitKey(0)
         cv2.destroyAllWindows()
         input_claim = detect_text(img_filepath)
+        print('input_claim :', input_claim)
         if input_claim == []:
-            input_claim = ''
+            input_claim = '0'
         if (len(input_claim[0].split()) < 5):
             input_claim = ''
         print(f'\n\nProcessing your claim......', file_name)
         surebot_logger.info(input_claim)
-        result, vb_result = executePipeline(input_claim, img_filepath, surebot_logger)
+        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger)
         print('Reverse Image Search Results :', result)
         print('Visual Bert Comparison Results :', vb_result)
-'''
+        print('Text Classification Results :', text_cls)
+

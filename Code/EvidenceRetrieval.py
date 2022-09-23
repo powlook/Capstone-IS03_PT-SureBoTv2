@@ -18,7 +18,7 @@ retrieve top relevant articles
 5. Return summarized articles as a list
 
 """
-import argparse, logging
+import logging, warnings
 import requests, time, os
 import numpy as np
 import pandas as pd
@@ -31,8 +31,8 @@ from pygooglenews import GoogleNews
 from sentence_transformers import util
 from celery.exceptions import SoftTimeLimitExceeded
 from transformers import AutoTokenizer, AutoModel, PegasusTokenizer, PegasusForConditionalGeneration
-
 from QueryImage import *
+warnings.filterwarnings("ignore")
 
 # Params
 length_penalty = 1.0
@@ -165,31 +165,24 @@ class EvidenceRetrieval(object):
 
         # Summarize the article (take TopN where N is number of articles)
         for article_url in articleurls[:topN]:
-            #try:
-
-            article_text = fulltext(requests.get(article_url, headers=self.headers).text)
-
-            # ************************#
-            # RUN PEGASUS
-            # ************************#
-            print(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
-            # print(article_text)
-            # self.logger.info(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
-            # self.logger.info(article_text)
-            articlesummary = self.AbstractiveSummary(article_text, length_penalty)
-            #print('Article Summary: ' + articlesummary)
-            #self.logger.info('Article Summary: ' + articlesummary)
-            articlesummarylist.append("".join(articlesummary))
-            #print('Abstraction has completed')
-            #self.logger.info('Abstraction has completed')
-
-            #except Exception as e:
-            #    if isinstance(e, SoftTimeLimitExceeded):
-            #        raise
-            #    else:
-            #        print('SUMMARISATION ERROR')
-            #        self.logger.info('SUMMARISATION ERROR')
-            #        articlesummarylist.append("")
+            try:
+                print("article_url :", article_url)
+                article_text = fulltext(requests.get(article_url, headers=self.headers).text)
+                # ************************#
+                # RUN PEGASUS
+                # ************************#
+                print(f'\nPERFORMING ABSTRACTION - ARTICLE: {article_url} . . .')
+                # print(article_text)
+                articlesummary = self.AbstractiveSummary(article_text, length_penalty)
+                #print('Article Summary: ' + articlesummary)
+                articlesummarylist.append("".join(articlesummary))
+                #print('Abstraction has completed')
+            except Exception as e:
+                if isinstance(e, SoftTimeLimitExceeded):
+                    raise
+                else:
+                    print("Error Type :", e)
+                    articlesummarylist.append("")
 
         # Retrieve Sentence Embeddings for input query
         query_embedding = self.semanticSimilarity(input_text, max_length)
@@ -308,6 +301,6 @@ def main(query):
 if __name__ == "__main__":
 
     df = pd.read_excel('ocr_text_220818.xlsx', usecols=['filename', 'ocr_text'])
-    ocr_text =df.loc[4]['ocr_text']
+    ocr_text =df.loc[12]['ocr_text']
     print('Query -ocr_text :', ocr_text)
     main(ocr_text)
