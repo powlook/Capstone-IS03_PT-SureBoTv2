@@ -122,32 +122,6 @@ Click on "Choose File" to select the image to upload. Click "Submit"
 
 **Step 5: Review the results**
 
-## SECTION 6: SYSTEM EXPLAINER VIDEO
-
-
-## SECTION 7: PROJECT REPORT / PAPER
-
-`Refer to project report at Github Folder: Project_Report`
-
-- Executive Summary
-- Problem Description & Background
-- Project Objective
-- Proposed Measurement Metrics
-- System Overview
-- Knowledge Modelling & Representation
-- System Architecture
-- System Implementation
-- Assumptions
-- System Performance
-- Limitations & Improvements
-- Conclusions
-- Appendix of report: Project Proposal
-- Appendix of report: Installation & User Guide
-- Appendix of report: 1-2 pages individual project report per project member
-- Appendix of report: Mapped System Functionalities against knowledge, techniques and skills of modular courses
-- Appendix of report: Performance Survey
-
-
 
 =======
 
