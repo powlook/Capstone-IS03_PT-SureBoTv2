@@ -27,7 +27,7 @@ Our application consists of a simple-to-use web application where one only needs
 
 ## SECTION 4: USER GUIDE
 
-### Installation (v2.0)
+### Installation
 Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Huggingface
 
 **Step 1: Get the repository**
