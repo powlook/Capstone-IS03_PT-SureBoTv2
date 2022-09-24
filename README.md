@@ -21,7 +21,7 @@ Our application consists of a simple-to-use web application where one only needs
 | Official Full Name | Student ID (MTech Applicable) | Work Items (Who Did What) | Email (Optional)
 | ---- | ---- | ---- | ---- |
 | CHUA HAO ZI | A0229960W | 1. Market Research <br /> 2. CAT-NET Research  <br /> 3. VisualBert Research and Implementation  <br /> 4. Text Classifier Modelling <br /> 5. Website UI Implementation <br /> 6. System Integration <br /> 7. Project Report Writing  | e0687368@u.nus.edu |
-| YAP POW LOOK  | A0163450M | 1. Market Research <br /> 2. External Knowledge Retrieval, Summarisation and Abstraction Review  <br /> 3. System Integration  <br /> 4. Project Report Writing | e0147014@u.nus.edu |
+| YAP POW LOOK  | A0163450M | 1. Market Research <br /> 2. External Knowledge Retrieval, Summarisation and Abstraction Review  <br /> 3. External Knowledge Retrieval Implementation <br /> 4. System Integration  <br /> 5. System Testing  <br /> 6. Project Report Writing | e0147014@u.nus.edu |
 | Kenneth Lee | AXXXXXX | 1. Market Research <br /> 2. <br /> 3.  <br /> 4. Project Report Writing | exxxxxx@u.nus.edu |
 
 
