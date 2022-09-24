@@ -25,7 +25,6 @@ surebot_logger = configure_logger(chat)
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = os.path.join("static", "upload")
 # print("SureBoT is waking up..... Please give it a few minutes....")
-print("* Running on http://localhost:5000/ (Press CTRL+C to quit)")
 
 class Classifier(nn.Module):
     
@@ -66,6 +65,8 @@ class Classifier(nn.Module):
 
 txt_model, txt_tokenizer = text_model()
 visualbert_model = vb_model()
+
+print("* Running on http://localhost:5000/ (Press CTRL+C to quit)")
 
 ############# Website Configuration #########################################
 @app.route('/')
@@ -115,4 +116,4 @@ def upload():
                             result=result, text_cls=text_cls, final=final_score)    
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=8000, debug=True)
+    app.run(host='localhost', port=5000, debug=True)
