@@ -36,8 +36,8 @@ from text_processing import process_ocr, process_text
 from QueryImage import *
 from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
-from VBInference import vb_inference
-from text_classifier import text_classification
+from VBInference import vb_inference, vb_model
+from text_classifier import text_classification, text_model
 
 warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -323,6 +323,8 @@ def configure_logger(chat):
 if __name__ == "__main__":
 
     chat = 0
+    txt_model, txt_tokenizer = text_model()
+    visualbert_model = vb_model()
     surebot_logger = configure_logger(chat)
     custom_fig = Figlet(font='slant')
     surebot_banner = custom_fig.renderText("SureBoTv2")
@@ -348,7 +350,7 @@ if __name__ == "__main__":
             input_claim = ''
         print(f'\n\nProcessing your claim......', file_name)
         surebot_logger.info(input_claim)
-        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger)
+        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model )
         print('Reverse Image Search Results :', result)
         print('Visual Bert Comparison Results :', vb_result)
         print('Text Classification Results :', text_cls)

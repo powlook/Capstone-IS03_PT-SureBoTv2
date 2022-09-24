@@ -21,23 +21,24 @@ import requests, time, os, re, io, cv2
 import logging, warnings
 import emoji
 import validators
-import torch
 import numpy as np
 import pandas as pd
+from glob import glob
 from pyfiglet import Figlet
 from newspaper import fulltext
 from spacy.lang.en import English
 from celery.exceptions import SoftTimeLimitExceeded
+import torch
 import torch.nn as nn
 from torchinfo import summary
 from transformers import AutoModel   #BertTokenizer, 
 
-from text_processing import *
+from text_processing import process_ocr, process_text
 from QueryImage import *
 from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
-from VBInference import vb_inference
-from text_classifier import text_classification
+from VBInference import vb_inference, vb_model
+from text_classifier import text_classification, text_model
 
 warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -101,7 +102,7 @@ class Classifier(nn.Module):
         return x
 
 
-def executePipeline(query, input_image, surebot_logger):
+def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer, visualbert_model):
     #####################################################
     # Initialization
     #####################################################
@@ -163,8 +164,8 @@ def executePipeline(query, input_image, surebot_logger):
                 sentenceToken.append(token.text)
 
             print(f'TOTAL NO. OF TOKENS FROM QUERY: {len(sentenceToken)}')
-            vb_outcome = vb_inference(input_image, querytext)
-            text_cls = text_classification(querytext)
+            vb_outcome = vb_inference(input_image, querytext, visualbert_model)
+            text_cls = text_classification(querytext, txt_model, txt_tokenizer)
 
             # If tokens > 50 - Perform Abstractive Summary on Query
             # Else just skip and perform Doc Retrieval
@@ -200,9 +201,9 @@ def executePipeline(query, input_image, surebot_logger):
                     pred_dict, outputs, heatmap = graphNet.predict(querytext, Filtered_Articles[i][1])
     
                     FactVerification_List.append(pred_dict['predicted_label'])
-                    print(pred_dict)
+                    print('graphNet prediction :', pred_dict)
                     #surebot_logger.info(pred_dict)
-                    print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
+                    #print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
                     #surebot_logger.info('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
                     #print((np.array(outputs.detach().cpu())))
                     #surebot_logger.info((np.array(outputs.detach().cpu())))
@@ -314,21 +315,31 @@ def configure_logger(chat):
 if __name__ == "__main__":
 
     chat = 0
+    txt_model, txt_tokenizer = text_model()
+    visualbert_model = vb_model()
     surebot_logger = configure_logger(chat)
-    data = pd.read_excel('ocr_text_220818.xlsx')
-    files = list(data['filename'])
-    picture_folder = '../images'
-    df = pd.DataFrame(columns=['filename', 'rev_img', 'vis_bert', 'text_cls', 'final_result'])
-    for i, file in enumerate(files[23:50]):
-        img_filepath = os.path.join(picture_folder, file)
-        print(img_filepath)
+    picture_folder = '../val'
+    files = glob(picture_folder+'/*.*')
+    df = pd.DataFrame(columns=['filename', 'rev_img', 'vis_bert', 'text_cls', 'final_result', 'ground_truth', 'eval_res'])
+    
+    for i, img_filepath in enumerate(files[29:]):
+        #img_filepath = os.path.join(picture_folder, file)
+    
+        file = img_filepath.split('\\')[1]
+        print(file)
+        if file[0] == '0':
+            ground_truth = 'SUPPORTS'
+        elif file[0] == '2':
+            ground_truth = 'REFUTES'
+        else: ground_truth = 'NONE'
+
         
         input_claim = detect_text(img_filepath)
         if input_claim == []:
             input_claim = '0'
         if (len(input_claim[0].split()) < 5):
             input_claim = ''
-        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger)
+        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model)
 
         all_scores = [result, vb_result, text_cls] #, img_doctoring]
         support, refute = 0, 0
@@ -344,10 +355,18 @@ if __name__ == "__main__":
         else:      
             final_score = "CANNOT BE DETERMINED"
 
-        print(i, file, result, vb_result, text_cls, final_score)
-        
-        df.loc[i] = file, result, vb_result, text_cls, final_score
-    
-    df.to_excel('inference_23_49.xlsx')
-        
+        if final_score == "CANNOT BE DETERMINED":
+            eval_res = ''
+        elif final_score == ground_truth:
+            eval_res = 'CORRECT'
+        else: eval_res = 'WRONG'
 
+        print(i, file, result, vb_result, text_cls, final_score, ground_truth, eval_res)
+        
+        df.loc[i] = file, result, vb_result, text_cls, final_score, ground_truth, eval_res
+
+    correct = df[df['eval_res'] == 'CORRECT']['eval_res'].value_counts()
+    wrong   = df[df['eval_res'] == 'WRONG']['eval_res'].value_counts()
+    print('Percentage correct :', round((correct[0] /(correct[0] + wrong[0]))*100,2), '%')
+    df.to_excel('validation_29_62.xlsx')
+    
