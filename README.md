@@ -23,71 +23,7 @@ Such medium often utilize both imagery and textual content to masquerade ideas t
 | Kenneth Lee | AXXXXXX | 1. Market Research <br /> 2. <br /> 3.  <br /> 4. Project Report Writing | exxxxxx@u.nus.edu |
 
 
-## SECTION 4: MARKETING VIDEO
-
-
-## SECTION 5: USER GUIDE
-
-### Installation
-Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Huggingface
-
-**Step 1: Get the repository**
-
-Using `git clone 
-```
-git clone <Github Repo URL>`
-```
-**Step 2: Create a Conda Environment**
-
-Create a new environment to sandbox your developmental workspace (with Anaconda Prompt)
-```
-conda create -n "YOUR_ENV_NAME" python=3.7
-```
-**Step 3: Install dependencies**
-
-Enter folder using `cd` and install requirements using `pip`
-```
-cd Code
-pip install -r requirements.txt
-```
-**Step 4: Download the Models**
-
-**Download pretrained & trained models**: https://drive.google.com/file/d/1FeBgqDi4ktVVu5x1CgsF63K3lKkSGTYZ/view?usp=sharing
-
-The folder structure will look like this:
-```
-pipeline_models/pretrained_models/BERT-Pair/
-    	pytorch_model.bin
-    	vocab.txt
-    	bert_config.json
-    	
-pipeline_models/models/bart-large-cnn
-	msmarco-distilroberta-base-v2
-	pegasus-cnn_dailymail
-	stsb-distilbert-base
-	1layerbest.pth
-	2layerbest.pth
-	3layerbest.pth
-	4layerbest.pth
-	
-pipeline_models/trained_models
-	finalized_model.pkl
-	model_roberta_base.pth
-```
-**Step 5: Download Spacy Model**
-
-Download ``en_core_web_sm`` via the following command
-```
-python -m spacy download en_core_web_sm
-```
-
-**Step 6: Download Detectron Model**
-
-**Download link:** https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
-
-```
-folder: detectron2
-```
+## SECTION 4: USER GUIDE
 
 ### Installation (v2.0)
 Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Huggingface
@@ -137,7 +73,7 @@ pipeline_models/trained_models
 	model_roberta_base.pth
 ```
 
-**Step 5: Download Detectron Model**
+**Step 5: Download Detectron2 Model**
 
 **Download model and replace the detectron2 folder:** <br/>https://drive.google.com/file/d/1hNJz9ZUT3sAzwgBjklNAS9dDFdY1pxS7/view?usp=sharing
 
@@ -161,7 +97,7 @@ pip install -r requirements.txt
 
 
 ### Usage
-We provide 3 methods to implement the system architecture: Command-Line Interface, Localhost Server Bot & Telegram Bot Deployment on GCE
+System implementation by Command-Line Interface.
 
 
 **For details for Localhost and GCE deployment, please refer to Report Appendix for step-by-step guide to setup**
@@ -170,13 +106,19 @@ For Command-Line Interface: Quick way to test out fact-checking functionality:
 
 **Step 1: Run**
 ```
-python SureBoT_v2.py
+python main.py
 ```
-**Step 2: Input Query Claim** <br/>Note: The images to be verified need to be uploaded in the "images" folder beforehand.
+**Step 2: Open Website**
 ```
-SureBoT: Input the image file that you would like to verify:
+Access "http://localhost:5000/" on Google Chrome
 ```
-**Step 3: Enter and Process Claim**
+**Step 3: Upload Image for Verification**
+```
+Click on "Choose File" to select the image to upload. Click "Submit"
+```
+**Step 4: Wait for SureBoTv2 to finish processing**
+
+**Step 5: Review the results**
 
 ## SECTION 6: SYSTEM EXPLAINER VIDEO
 
