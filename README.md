@@ -101,11 +101,6 @@ pip install -r requirements.txt
 ### Usage
 System implementation by Command-Line Interface.
 
-
-**For details for Localhost and GCE deployment, please refer to Report Appendix for step-by-step guide to setup**
-
-For Command-Line Interface: Quick way to test out fact-checking functionality:
-
 **Step 1: Run**
 ```
 python main.py
