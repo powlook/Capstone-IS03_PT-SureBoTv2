@@ -32,9 +32,9 @@ Reccomend to use python 3.7 or higher. Requires Pytorch and Transformers from Hu
 
 **Step 1: Get the repository**
 
-Using `git clone 
+Using git clone 
 ```
-git clone <Github Repo URL>`
+git clone <Github Repo URL>
 ```
 **Step 2: Create a Virtual Environment**
 
