@@ -7,7 +7,7 @@ import numpy as np
 import datetime
 import warnings
 from transformers import logging
-logging.set_verbosity_warning()
+logging.set_verbosity_error()
 
 warnings.filterwarnings('ignore')
 
