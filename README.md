@@ -6,7 +6,7 @@ This project is an extension of SureBotv1 (https://github.com/adrielkuek/IRS-PM-
 
 ## SureBoTv2 - Combating Multimodel Misinformation and Disinformation
 
-![surebot](https://user-images.githubusercontent.com/67159970/114734523-dfb7d280-9d76-11eb-9d84-a029fa6a5a29.gif)
+![surebot](https://github.com/powlook/Capstone-IS03_PT-SureBoTv2/blob/Code/static/logo.png?raw=true)
 
 ## SECTION 2: OBJECTIVES
 
