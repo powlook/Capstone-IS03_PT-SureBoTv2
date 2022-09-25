@@ -127,8 +127,10 @@ python SureBoT_v2.py
 ```
 **Step 2: Enter Image Name**
 ```
-Enter Image Name, e.g. 0001.jpg (Note: This is assuming that user has already uploaded the image in the "images" folder)
+Enter Image Name, e.g. 0001.jpg 
 ```
+(Note: This is assuming that user has already uploaded the image in the "images" folder)
+
 **Step 3: Check if correct image is extracted for processing**
 ```
 Extracted Image will be shown. Proceed to close the window after verification
