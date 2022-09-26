@@ -142,15 +142,36 @@ Extracted Image will be shown. Proceed to close the window after verification
 
 ## SECTION 5: Separate Guide for Image Doctoring Detection (CAT-NET)
 
+Note: CAT-NET works separately from SureBoTv2 system as this was not fully integrated with the architecture yet.
+
 ### Installation
 
-**Step 1: Download CAT-NET with model weights**
+**Step 1: Get the repository**
 
-**Download from this link:** <br/>https://drive.google.com/file/d/1k2sszayWUBZLFgYrgwh9cKylKFsWmjol/view?usp=sharing
+Using git clone 
+```
+git clone <Github Repo URL>
 ```
 
+**Step 2: Download CAT-NET with model weights**
+
+**Download from this link:** <br/>https://drive.google.com/drive/folders/1hBEfnFtGG6q_srBHVEmbF3fTq0IhP8jq?usp=sharing
+
+Place the folder into the "pretrained_models" and "output" folders into the git cloned repository folder: "./Code/CAT-NET"
 ```
-**Step 2: Create Virtual Environment**
+CAT-Net
+├── pretrained_models  (pretrained weights for each stream)
+│   ├── DCT_djpeg.pth.tar
+│   └── hrnetv2_w48_imagenet_pretrained.pth
+├── output  (trained weights for CAT-Net)
+│   └── splicing_dataset
+│       ├── CAT_DCT_only
+│       │   └── DCT_only_v2.pth.tar
+│       └── CAT_full
+│           └── CAT_full_v1.pth.tar
+│           └── CAT_full_v2.pth.tar
+```
+**Step 3: Create Virtual Environment**
 
 ```
 cd Code
@@ -159,11 +180,11 @@ conda activate "YOUR_ENV_NAME"
 conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=10.0 -c pytorch
 ```
 
-**Step 3: Install Requirements**
+**Step 4: Install Requirements**
 ```
 pip install -r requirements.txt
 ```
-**Step 4: Install jpegio**
+**Step 5: Install jpegio**
 ```
 git clone https://github.com/dwgoon/jpegio.git
 python setup.py install
