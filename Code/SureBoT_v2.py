@@ -38,6 +38,7 @@ from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
 from VBInference import vb_inference, vb_model
 from text_classifier import text_classification, text_model
+from cat_net import cat_inference
 
 warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -168,17 +169,15 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
 
             # If tokens > 50 - Perform Abstractive Summary on Query
             # Else just skip and perform Doc Retrieval
-    
+            Image_Articles = []
             Filtered_Articles = []
             # Run ER pipeline
             start_time = time.time()
             if len(sentenceToken) > 20:
                 querytext = ER_pipeline.AbstractiveSummary(querytext, length_penalty) 
-            Image_Articles = ER_pipeline.ReverseImageSearch(querytext, input_image, topN)
-            print('Image_Articles :', Image_Articles)
-    
-            #if len(sentenceToken) > 20:
-            #    ocrtext = ER_pipeline.AbstractiveSummary(querytext, length_penalty)
+            #Image_Articles = ER_pipeline.ReverseImageSearch(querytext, input_image, topN)
+            #print('Image_Articles :', Image_Articles)   # Similarity Score > 0.4
+
             Filtered_Articles = ER_pipeline.RetrieveArticles(querytext, topN)
     
             Filtered_Articles = Filtered_Articles + Image_Articles
@@ -190,11 +189,6 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
             #surebot_logger.info(f'\n===== ARTICLES RETRIEVAL RESULTS =====')
             print(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
             #surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
-    
-            #output_message = ""
-            #output_message = "===== FACT CHECK RESULTS ====="
-            #output_message += "\nTime-Taken: {} seconds".format(int(time.time() - start))
-            #output_message += "\nQuery Input: {}".format(query)
     
             if len(Filtered_Articles) == 0:
                 #output_message += 'NO MATCHING ARTICLES FOUND'
@@ -349,9 +343,12 @@ if __name__ == "__main__":
         if (len(input_claim[0].split()) < 5):
             input_claim = ''
         print(f'\n\nProcessing your claim......', file_name)
+        s_time = time.time()
         surebot_logger.info(input_claim)
         result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model )
         print('Reverse Image Search Results :', result)
         print('Visual Bert Comparison Results :', vb_result)
         print('Text Classification Results :', text_cls)
+        e_time = (time.time() - s_time)/60
+        print(f'Total time taken : {round(e_time,2)} mins')
 
