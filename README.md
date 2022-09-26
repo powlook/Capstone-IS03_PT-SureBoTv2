@@ -140,5 +140,35 @@ Extracted Image will be shown. Proceed to close the window after verification
 **Step 5: Review the results**
 
 
+## SECTION 5: Separate Guide for Image Doctoring Detection (CAT-NET)
+
+### Installation
+
+**Step 1: Download CAT-NET with model weights**
+
+**Download from this link:** <br/>https://drive.google.com/file/d/1k2sszayWUBZLFgYrgwh9cKylKFsWmjol/view?usp=sharing
+```
+
+```
+**Step 2: Create Virtual Environment**
+
+```
+cd Code
+conda create --n "YOUR_ENV_NAME"  python=3.6
+conda activate "YOUR_ENV_NAME"
+conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=10.0 -c pytorch
+```
+
+**Step 3: Install Requirements**
+```
+pip install -r requirements.txt
+```
+**Step 4: Install jpegio**
+```
+git clone https://github.com/dwgoon/jpegio.git
+python setup.py install
+```
+
+
 =======
 
