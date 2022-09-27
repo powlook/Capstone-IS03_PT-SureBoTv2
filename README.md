@@ -99,7 +99,7 @@ pip install -r requirements.txt
 
 
 ### System Usage - Flask Based Web App
-System implementation by Flask Based Web App.
+System implementation by Flask Based Web App (for single image processing).
 
 **Step 1: Run**
 ```
@@ -119,17 +119,18 @@ Click on "Choose File" to select the image to upload. Click "Submit"
 
 
 ### System Usage - Command Line Interface
-System implementation by Command Line Interface.
+System implementation by Command Line Interface (for multiple image processing)
 
-**Step 1: Run**
+**Step 1: Upload images into folder**
+
+```
+Place the image files in the "images" folder
+```
+
+**Step 2: Run**
 ```
 python SureBoT_v2.py
 ```
-**Step 2: Enter Image Name**
-```
-Enter Image Name, e.g. 0001.jpg 
-```
-(Note: This is assuming that user has already uploaded the image in the "images" folder)
 
 **Step 3: Check if correct image is extracted for processing**
 ```
@@ -138,6 +139,8 @@ Extracted Image will be shown. Proceed to close the window after verification
 **Step 4: Wait for SureBoTv2 to finish processing**
 
 **Step 5: Review the results**
+
+**Step 6: Repeat Steps (3) to (5) until all images are processed**
 
 
 ## SECTION 5: Separate Guide for Image Doctoring Detection (CAT-NET)
