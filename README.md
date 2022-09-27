@@ -173,6 +173,8 @@ CAT-Net
 ```
 **Step 3: Create Virtual Environment**
 
+Enter the following command into Anaconda Prompt.
+
 ```
 cd Code
 conda create --n "YOUR_ENV_NAME"  python=3.6
