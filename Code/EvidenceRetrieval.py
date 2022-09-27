@@ -208,8 +208,8 @@ class EvidenceRetrieval(object):
         #self.logger.info(filteredarticles)
 
         # Output to excel/csv file [Optional]
-        df = pd.DataFrame(filteredarticles, columns=["Score", "Summarized Content", "URL"])
-        df.to_excel(self.filepath + "/Output.xlsx", sheet_name="Query")
+        # df = pd.DataFrame(filteredarticles, columns=["Score", "Summarized Content", "URL"])
+        # df.to_excel(self.filepath + "/Output.xlsx", sheet_name="Query")
 
         return filteredarticles
 
