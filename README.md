@@ -140,6 +140,11 @@ Extracted Image will be shown. Proceed to close the window after verification
 
 **Step 5: Review the results**
 
+```
+Results can be viewed in the Command Line Interface or via an excel output file named "img_output.xlsx"
+```
+
+
 **Step 6: Repeat Steps (3) to (5) until all images are processed**
 
 
