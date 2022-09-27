@@ -179,7 +179,7 @@ Enter the following command into Anaconda Prompt.
 conda create -n "YOUR_ENV_NAME"  python=3.6
 conda activate "YOUR_ENV_NAME"
 conda install pytorch==1.1.0 torchvision==0.3.0 cudatoolkit=10.0 -c pytorch
-cd Code
+cd Code\CAT_Net
 ```
 
 **Step 4: Install Requirements**
