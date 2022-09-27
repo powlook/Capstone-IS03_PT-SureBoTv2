@@ -157,7 +157,7 @@ git clone <Github Repo URL>
 
 **Download from this link:** <br/>https://drive.google.com/drive/folders/1hBEfnFtGG6q_srBHVEmbF3fTq0IhP8jq?usp=sharing
 
-Place the folder into the "pretrained_models" and "output" folders into the git cloned repository folder: "./Code/CAT-NET"
+Re-arrange the files into the designated folders as indicated below, before placing them into the git cloned respository folder ("./Code/CAT-NET")
 ```
 CAT-Net
 ├── pretrained_models  (pretrained weights for each stream)
