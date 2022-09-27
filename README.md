@@ -194,5 +194,28 @@ python setup.py install
 ```
 
 
+### Usage
+
+**Step 1: Upload images into folder**
+
+```
+Place the image file in the "images" folder
+```
+
+**Step 2: Change the image_name within the cat_net.py file**
+
+```
+image_name = "IMG_NAME"
+```
+
+**Step 3: Wait for the codes to finish processing**
+
+**Step 4: Review the results**
+
+```
+Review results in Command Terminal
+Review the output heatmap in the "output_pred" folder
+```
+
 =======
 
