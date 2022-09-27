@@ -1,25 +1,25 @@
 """
-Authors: Adriel Kuek, Chua Hao Zi, Lavanya, Francis Louis
-Date Created: 25 March 2021
+Authors: Adriel Kuek, Chua Hao Zi, Yap Pow Look
+Date Created: 27 September 2022
 Version:
-Email: hz29990@gmail.com, adrielkuek@gmail.com, francis.louis@gmail.com, lavanya2204@hotmail.com
+Email: hz29990@gmail.com, adrielkuek@gmail.com
 Status: Development
 
 Description:
-SureBo(T) is an end to end automatic fact-checking BOT based on
-TELEGRAM API that retrieves multi document inputs for fact
-verification based on a single input query. The input query currently
-takes the form of a text message that is dubious in content.
+SureBo(T) is an end to end automatic fact-checking BOT which
+does external image retrival verification, joint visual-linguistics modelling
+and text classification of OCR text based on a single input query.
+The input query currently takes the form of an image that is dubious in content.
 
-In fulfilment of the requirements for the Intelligent Reasoning Systems
-project under the Master of Technology (Intelligent Systems)
-- NUS Institute of System Sciences (AY2021 - Semester 2)
+In fulfilment of the requirements for the Capstone project
+under the Master of Technology (Intelligent Systems)
+- NUS Institute of System Sciences
 
 """
 
 import requests, time, os, re, io, cv2
 import logging, warnings
-import emoji
+import emoji, glob
 import validators
 import numpy as np
 import pandas as pd
@@ -38,7 +38,7 @@ from GraphNetFC import graphNetFC
 from EvidenceRetrieval import EvidenceRetrieval
 from VBInference import vb_inference, vb_model
 from text_classifier import text_classification, text_model
-from cat_net import cat_inference
+##from cat_net import cat_inference
 
 warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"
@@ -327,28 +327,34 @@ if __name__ == "__main__":
     surebot_logger.info('\n')
     surebot_logger.info(surebot_banner + "version 2.0\n")
     picture_folder = '../images'
+    picture_list = os.listdir(picture_folder)
+    # image_path = os.path.join(os.path.dirname(os.getcwd()), "images")
+    print(picture_list)
     while True:
-        #print(f'\n\nSureBoT: Input a claim that you would like to fact-check!')
-        #surebot_logger.info(f'SureBoTv2: Input a picture (filename) that you will like to fact-check!')
-        file_name = str(input("Filename: "))
-        img_filepath = os.path.join(picture_folder, file_name)
-        img = cv2.imread(img_filepath, cv2.IMREAD_ANYCOLOR)
-        cv2.imshow('Picture', img)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        input_claim = detect_text(img_filepath)
-        print('input_claim :', input_claim)
-        if input_claim == []:
-            input_claim = '0'
-        if (len(input_claim[0].split()) < 5):
-            input_claim = ''
-        print(f'\n\nProcessing your claim......', file_name)
-        s_time = time.time()
-        surebot_logger.info(input_claim)
-        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model )
-        print('Reverse Image Search Results :', result)
-        print('Visual Bert Comparison Results :', vb_result)
-        print('Text Classification Results :', text_cls)
-        e_time = (time.time() - s_time)/60
-        print(f'Total time taken : {round(e_time,2)} mins')
+        for img in picture_list:
+            #print(f'\n\nSureBoT: Input a claim that you would like to fact-check!')
+            #surebot_logger.info(f'SureBoTv2: Input a picture (filename) that you will like to fact-check!')
+##            file_name = str(input("Filename: "))
+            print(f"===== Image File Name: {img} ===== ")
+            file_name = img
+            img_filepath = os.path.join(picture_folder, file_name)
+            img = cv2.imread(img_filepath, cv2.IMREAD_ANYCOLOR)
+            cv2.imshow('Picture', img)
+            cv2.waitKey(0)
+            cv2.destroyAllWindows()
+            input_claim = detect_text(img_filepath)
+            print('input_claim :', input_claim)
+            if input_claim == []:
+                input_claim = '0'
+            if (len(input_claim[0].split()) < 5):
+                input_claim = ''
+            print(f'\n\nProcessing your claim......', file_name)
+            s_time = time.time()
+            surebot_logger.info(input_claim)
+            result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model )
+            print('Reverse Image Search Results :', result)
+            print('Visual Bert Comparison Results :', vb_result)
+            print('Text Classification Results :', text_cls)
+            e_time = (time.time() - s_time)/60
+            print(f'Total time taken : {round(e_time,2)} mins')
 

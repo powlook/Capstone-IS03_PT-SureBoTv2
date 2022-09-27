@@ -11,7 +11,7 @@ import torch.nn as nn
 from text_classifier import text_model
 from VBInference import vb_model
 from transformers import logging
-logging.set_verbosity_warning()
+logging.set_verbosity_error()
 
 # warnings.filterwarnings("ignore")
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key/image_search.json"

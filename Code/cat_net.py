@@ -7,9 +7,12 @@ from CAT_Net.tools.infer import cat_pred
 
 
 # Input Examples [NEED TO CHANGE THIS ACCCORDINGLY)]
-cat_net_root = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT_Net'
-image_folder = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/val'
-path_out_folder = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT-Net\output_pred'
+cat_net_root =  os.path.join(os.getcwd(), "CAT_Net")
+image_folder = os.path.join(os.getcwd(), "val")
+path_out_folder = os.path.join(os.getcwd(), "CAT_Net", "output_pred")
+##cat_net_root = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT_Net'
+##image_folder = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/val'
+##path_out_folder = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT-Net\output_pred'
 
 # Catnet wrappers Function to call
 def cat_inference(filename, cat_net_root):
@@ -74,7 +77,10 @@ def cat_inference(filename, cat_net_root):
 
 if __name__ == '__main__':
 
-    image_path = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/images/001.jpg'
-    cat_net_root = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT_Net'
+    image_name = "2002.png"
+    cat_net_root = os.path.join(os.getcwd(), "CAT_Net")
+    image_path = os.path.join(os.path.dirname(os.getcwd()), "images", image_name)
+##    image_path = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/images/001.jpg'
+##    cat_net_root = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT_Net'
     pred_bool, score, heatmap = cat_inference(image_path, cat_net_root)
     print(pred_bool, score, heatmap)
