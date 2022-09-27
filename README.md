@@ -189,6 +189,7 @@ pip install -r requirements.txt
 **Step 5: Install jpegio**
 ```
 git clone https://github.com/dwgoon/jpegio.git
+cd jpegio
 python setup.py install
 ```
 
