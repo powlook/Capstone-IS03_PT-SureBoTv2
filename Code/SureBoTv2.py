@@ -18,12 +18,11 @@ project under the Master of Technology (Intelligent Systems)
 """
 
 import requests, time, os, re, io, cv2
-import logging, warnings, argparse
+import logging, warnings
 import emoji
 import validators
 import numpy as np
 import pandas as pd
-from glob import glob
 from pyfiglet import Figlet
 from newspaper import fulltext
 from spacy.lang.en import English
@@ -108,13 +107,13 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
     # Initialization
     #####################################################
     try:
-        #print(f'DEVICE Used : {device}')
+        print(f'DEVICE Used : {device}')
         #surebot_logger.info(f'\n=============== NEW QUERY ===============')
         #surebot_logger.info(f'DEVICE Used : {device}')
         start = time.time()
         cwd = os.path.dirname(os.path.realpath(__file__))
         print(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
-        surebot_logger.info(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
+        #surebot_logger.info(f'INITIALISE EVIDENCE RETRIEVAL PIPELINE . . .')
         ER_pipeline = EvidenceRetrieval(cwd, device, surebot_logger)
         query_image = QueryImage(cwd)
         final_score = 'NO MATCHING ARTICLES FOUND'
@@ -156,8 +155,8 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
         else:
             # Query Preprocessing
             #querytext = query_preprocessing(query, surebot_logger)
-            querytext = query[0]           # remove the list
-            
+            querytext = query[0]
+            #print('querytext :', querytext)
             # Use SPACY to get number of tokens
             nlp = English()
             myDoc = nlp(querytext)
@@ -170,27 +169,30 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
 
             # If tokens > 50 - Perform Abstractive Summary on Query
             # Else just skip and perform Doc Retrieval
-
-            # Run ER pipeline    
+            Image_Articles = []
             Filtered_Articles = []
+            # Run ER pipeline
             start_time = time.time()
             if len(sentenceToken) > 20:
                 querytext = ER_pipeline.AbstractiveSummary(querytext, length_penalty) 
             Image_Articles = ER_pipeline.ReverseImageSearch(querytext, input_image, topN)
-    
+            print('Image_Articles :', Image_Articles)   # Similarity Score > 0.4
+
             Filtered_Articles = ER_pipeline.RetrieveArticles(querytext, topN)
     
             Filtered_Articles = Filtered_Articles + Image_Articles
     
             print(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
             #surebot_logger.info(f'>>>>>>> TIME TAKEN - ER PIPELINE: {time.time() - start_time}')
-            print('===== ARTICLES RETRIEVAL RESULTS =====')
+    
+            print(f'===== ARTICLES RETRIEVAL RESULTS =====')
             #surebot_logger.info(f'\n===== ARTICLES RETRIEVAL RESULTS =====')
-            print('Number of Articles After Filtering: {len(Filtered_Articles)}')
+            print(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
             #surebot_logger.info(f'Number of Articles After Filtering: {len(Filtered_Articles)}')
     
             if len(Filtered_Articles) == 0:
-                print('NO MATCHING ARTICLES FOUND')
+                #output_message += 'NO MATCHING ARTICLES FOUND'
+                print(f'NO MATCHING ARTICLES FOUND')
                 #surebot_logger.info(f'NO MATCHING ARTICLES FOUND')
             else:
                 # Run Fact Verification - Graph NET
@@ -202,7 +204,7 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
                     pred_dict, outputs, heatmap = graphNet.predict(querytext, Filtered_Articles[i][1])
     
                     FactVerification_List.append(pred_dict['predicted_label'])
-                    print('graphNet prediction :', pred_dict)
+                    print(pred_dict)
                     #surebot_logger.info(pred_dict)
                     #print('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
                     #surebot_logger.info('[SUPPORTS, REFUTES, NOT ENOUGH INFO]')
@@ -211,7 +213,7 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
     
                 maj_vote = 0
                 for i in range(len(Filtered_Articles)):
-                    print(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
+                    #print(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
                     #surebot_logger.info(f'ARTICLE: {Filtered_Articles[i][2]} - {FactVerification_List[i]}')
                     if FactVerification_List[i] == 'SUPPORTS':
                         maj_vote += 1
@@ -228,12 +230,12 @@ def executePipeline(query, input_image, surebot_logger, txt_model, txt_tokenizer
                     final_score = 'REFUTES'
                     print('************** FINAL SCORE: REFUTES')
                     #surebot_logger.info(f'************** FINAL SCORE: REFUTES')
-    
 
     except Exception as e:
         if isinstance(e, SoftTimeLimitExceeded):
-            raise
+            raise SoftTimeLimitExceeded()
         else:
+            #output_message = 'Exception occurred in pipeline'
             print('Error Type :', e)
     
     return final_score, vb_outcome, text_cls
@@ -302,8 +304,7 @@ def configure_logger(chat):
     if not os.path.exists(logDir):
         os.makedirs(logDir)
 
-    timing = time.asctime(time.localtime(time.time()))
-    # logFile = logDir + '/' + timing.replace(' ','_') + '.log'
+    #timing = time.asctime(time.localtime(time.time()))
     logFile = logDir + '/chat_' + str(chat) + '.log'
     handler = logging.FileHandler(logFile)
     formatter = logging.Formatter('')
@@ -313,84 +314,43 @@ def configure_logger(chat):
     return surebot_logger
 
 
-def main(picture_folder, output_file):
+def main():
 
     chat = 0
-    print(f'DEVICE Used : {device}')
     txt_model, txt_tokenizer = text_model()
     visualbert_model = vb_model()
     surebot_logger = configure_logger(chat)
-    print('picture_folder :', picture_folder)
-    print('output_file :', output_file)
-    #picture_folder = '../test1'
-    #output_file = 'validation_29_62.xlsx'
-    files = glob(picture_folder+'/*.jpg')
-    print('image files to verify :', files)
-    df = pd.DataFrame(columns=['filename', 'rev_img', 'vis_bert', 'text_cls',
-                               'final_result', 'ground_truth', 'eval_res', 'time_taken(min)'])
-    
-    for i, img_filepath in enumerate(files):
-        #img_filepath = os.path.join(picture_folder, file)
-        s_time = time.time()
-        file = img_filepath.split('\\')[1]
-        print(f'\n=============== QUERY NO : {i+1} ===============')
-        print('Image file queried :', file)
-        if file[0] == '0':
-            ground_truth = 'SUPPORTS'
-        elif file[0] == '2':
-            ground_truth = 'REFUTES'
-        else: ground_truth = 'NONE'
-
-        
+    custom_fig = Figlet(font='slant')
+    surebot_banner = custom_fig.renderText("SureBoTv2")
+    print('\n')
+    print(surebot_banner + "version 2.0\n")
+    picture_folder = '../test1'
+    print('Picture folder :', picture_folder)
+    while True:
+        print(f'\n=============== NEW QUERY ===============')
+        file_name = str(input("Filename: "))
+        img_filepath = os.path.join(picture_folder, file_name)
+        img = cv2.imread(img_filepath, cv2.IMREAD_ANYCOLOR)
+        cv2.imshow('Picture', img)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
         input_claim = detect_text(img_filepath)
+        print('input_claim :', input_claim)
         if input_claim == []:
             input_claim = '0'
         if (len(input_claim[0].split()) < 5):
             input_claim = ''
-        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, 
-                                                      surebot_logger, txt_model, 
-                                                      txt_tokenizer,visualbert_model)
-
-        all_scores = [result, vb_result, text_cls] #, img_doctoring]
-        support, refute = 0, 0
-        for score in all_scores:
-            if "SUPPORTS" in score:
-                support += 1
-            elif "REFUTES" in score:
-                refute += 1
-        if support > refute:
-            final_score = 'SUPPORTS'
-        elif support < refute:
-            final_score = 'REFUTES' 
-        else:      
-            final_score = "CANNOT BE DETERMINED"
-
-        if final_score == "CANNOT BE DETERMINED":
-            eval_res = ''
-        elif final_score == ground_truth:
-            eval_res = 'CORRECT'
-        else: eval_res = 'WRONG'
-        
-        e_time  = round((time.time() - s_time)/60,2)
-        print(f'Total time taken : {e_time} mins')
-        #print(i, file, result, vb_result, text_cls, final_score, ground_truth, eval_res, e_time)
-
-        df.loc[i] = file, result, vb_result, text_cls, final_score, ground_truth, eval_res, e_time
-
-    correct = df[df['eval_res'] == 'CORRECT']['eval_res'].value_counts()
-    wrong   = df[df['eval_res'] == 'WRONG']['eval_res'].value_counts()
-
-    #print('Percentage correct :', round((correct[0] /(correct[0] + wrong[0]))*100,2), '%')
-    df.to_excel(os.path.join(picture_folder, output_file))
-    print(df)
-    return df, correct, wrong
+        print('\n\nProcessing your claim......', file_name)
+        s_time = time.time()
+        surebot_logger.info(input_claim)
+        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, surebot_logger, txt_model, txt_tokenizer,visualbert_model )
+        print('External Knowledge Retrieval Results :', result)
+        print('Visual Bert Comparison Results :', vb_result)
+        print('Text Classification Results :', text_cls)
+        e_time = (time.time() - s_time)/60
+        print(f'Total time taken : {round(e_time,2)} mins')
 
 
 if __name__ == "__main__":
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--picture_folder", type=str, default='../test4', help='eg ../test1')
-    parser.add_argument("--output_file", type=str, default='results.xlsx', help='eg report.xlsx')
-    args = parser.parse_args()
-    df, correct, wrong = main(args.picture_folder, args.output_file) 
-    
+    main()

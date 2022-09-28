@@ -100,6 +100,7 @@ def vb_inference(img_path, text, loaded_model):
             preds = preds.detach().cpu().numpy()
             predicted_class = np.argmax(preds)
     
+    print('\nVisual Bert Results :', outcome[predicted_class])
     return outcome[predicted_class]
 
 # if __name__ == "__main__":

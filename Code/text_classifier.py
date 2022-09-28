@@ -121,14 +121,16 @@ def text_classification(input_text, model, tokenizer):
 
     # Move logits and labels to CPU
     logits = logits.detach().cpu().numpy()
-    print(logits)
+    #print(logits)
 
     pred_labels = np.argmax(logits, axis=1).flatten()
-    print(pred_labels[0])
+
 
     if pred_labels[0] == 1:
         output_label = "SUPPORTS"
     elif pred_labels[0] == 0:
         output_label = "REFUTES"
+        
+    print(f'\nText Classfication Results : {output_label}\n')
     
     return output_label
