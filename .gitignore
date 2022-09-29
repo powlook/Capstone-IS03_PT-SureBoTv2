@@ -26,4 +26,8 @@ data
 .ipynb
 key/*.json
 .sh
-
+CAT_Net/output
+CAT_Net/input
+CAT_Net/Splicing
+CAT_Net/output_pred
+Code/key/*.json
