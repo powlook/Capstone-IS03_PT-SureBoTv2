@@ -1,13 +1,13 @@
 **Here is how to setup CAT_Net in the SureBoTv2 environment**
 
-# Make sure the dependencies as required in the requirements.txt is installed
+### Make sure the dependencies as required in the requirements.txt is installed
 
-# Install jpegio
+### Install jpegio
 git clone https://github.com/dwgoon/jpegio.git
 cd jpegio
 python setup.py install
 
-# Download and create weights
+### Download and create weights
 Download Weights: https://drive.google.com/drive/folders/1hBEfnFtGG6q_srBHVEmbF3fTq0IhP8jq
 Store the weights as shown in the folders below:
 
@@ -39,5 +39,3 @@ CAT-Net
 Review results in Command Terminal
 Review the output heatmap in the "output_pred" folder
 ```
-
-=======
