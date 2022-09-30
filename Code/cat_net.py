@@ -1,18 +1,14 @@
-import os
+import os, warnings
 import shutil
 import sys
 from pathlib import Path
 import numpy as np
 from CAT_Net.tools.infer import cat_pred
-
+warnings.filterwarnings("ignore")
 
 # Input Examples [NEED TO CHANGE THIS ACCCORDINGLY)]
-cat_net_root =  os.path.join(os.getcwd(), "CAT_Net")
-image_folder = os.path.join(os.getcwd(), "val")
-path_out_folder = os.path.join(os.getcwd(), "CAT_Net", "output_pred")
-##cat_net_root = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT_Net'
-##image_folder = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/val'
-##path_out_folder = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT-Net\output_pred'
+image_folder = os.path.join(os.getcwd(), "images")
+#path_out_folder = os.path.join(os.getcwd(), "CAT_Net", "output_pred")
 
 # Catnet wrappers Function to call
 def cat_inference(filename, cat_net_root):
@@ -27,7 +23,7 @@ def cat_inference(filename, cat_net_root):
     """
     # Initialise outputs as nan 
     pred_bool = score = heatmap = np.nan
-    image_folder = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/val'
+    #image_folder = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/images'
     # Cat Net Folders
     print('Parsing Image to CAT-Net') 
     path_cat_net_input = os.path.join(cat_net_root, 'input')
@@ -40,12 +36,8 @@ def cat_inference(filename, cat_net_root):
 
     if not os.path.isfile(input_image):
         print('Invalid Input Image Path')
-    #file_name = os.path.split(path_img_input)
-    #file_name = input_image.split("//")[-1]
-    #print('file_name :', file_name)
     shutil.copy(input_image, path_cat_net_input)
     path_cat_net_input = os.path.join(path_cat_net_input, filename)
-    print('path_cat_net_input :', path_cat_net_input)
     # Run Inference if valid file in input 
     if os.path.isfile(path_cat_net_input):
         print('Running CAT-Net Inference: May take several mins on CPU depending on file size')
@@ -58,7 +50,8 @@ def cat_inference(filename, cat_net_root):
         print('Invalid Inference Image Path')
     
     # Move Pred and Original Image to Surebot final output 
-    file_name_root = os.path.splitext(filename)[0]
+    #file_name_root = os.path.splitext(filename)[0]
+    file_name_root = filename.split('\\')[-1].split('.')[0]
     path_cat_net_pred = os.path.join(path_cat_net_output, file_name_root+'.png')
     path_org_out = os.path.join(path_cat_net_output, filename)  # To handle for mix input format   
     path_pred_out = os.path.join(path_cat_net_output, file_name_root+'.png') # To handle for mix input format   
@@ -77,10 +70,9 @@ def cat_inference(filename, cat_net_root):
 
 if __name__ == '__main__':
 
-    image_name = "2002.png"
+    
+image_name = "0001.jpg"
     cat_net_root = os.path.join(os.getcwd(), "CAT_Net")
     image_path = os.path.join(os.path.dirname(os.getcwd()), "images", image_name)
-##    image_path = 'D:/Capstone/Capstone-IS03_PT-SureBoTv2/images/001.jpg'
-##    cat_net_root = 'D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code\CAT_Net'
     pred_bool, score, heatmap = cat_inference(image_path, cat_net_root)
     print(pred_bool, score, heatmap)
