@@ -27,17 +27,9 @@ CAT-Net
 
 ### Usage
 
-**Step 1: Upload images into folder**
+**Step 1: Upload images into the images folder**
 
-```
-Place the image file in the "images" folder
-```
-
-**Step 2: Change the image_name within the cat_net.py file**
-
-```
-image_name = "IMG_NAME"
-```
+**Step 2: Enter the file_name in the command prompt "Filename:"**
 
 **Step 3: Wait for the codes to finish processing**
 

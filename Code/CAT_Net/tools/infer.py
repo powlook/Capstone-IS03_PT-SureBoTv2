@@ -11,12 +11,10 @@ if path not in sys.path:
 import argparse
 import pprint
 import shutil
-
 import logging
 import time
 import timeit
 from pathlib import Path
-
 import numpy as np
 from tqdm import tqdm
 
@@ -139,7 +137,7 @@ def cat_pred():
     return pred_bool, score, heatmap
 
 if __name__ == '__main__':
-    pred_bool, score, heatmap = cat_inf()
+    pred_bool, score, heatmap = cat_pred()
     print(pred_bool)
     print(score)
     print(heatmap)
