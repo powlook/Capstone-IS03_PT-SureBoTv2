@@ -324,7 +324,7 @@ def main():
     surebot_banner = custom_fig.renderText("SureBoTv2")
     print('\n')
     print(surebot_banner + "version 2.0\n")
-    picture_folder = '../test1'
+    picture_folder = '../images'
     print('Picture folder :', picture_folder)
     while True:
         print(f'\n=============== NEW QUERY ===============')

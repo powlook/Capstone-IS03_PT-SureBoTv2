@@ -1,9 +1,11 @@
-import os, warnings
+import os, warnings, time
 import shutil
 import sys
+from glob import glob
 from pathlib import Path
 from pyfiglet import Figlet
 import numpy as np
+import pandas as pd
 from CAT_Net.tools.infer import cat_pred
 warnings.filterwarnings("ignore")
 
@@ -65,8 +67,9 @@ def cat_inference(filename, cat_net_root):
     
     return pred_bool, score, heatmap
 
-if __name__ == '__main__':
 
+def main():
+    
     custom_fig = Figlet(font='standard')
     catnet_banner = custom_fig.renderText("CAT_Net")
     print('\n')
@@ -75,7 +78,7 @@ if __name__ == '__main__':
     picture_list = os.listdir(picture_folder)
     while True:
         os.chdir('D:\Capstone\Capstone-IS03_PT-SureBoTv2\Code')
-        print(f"\n===== NEW QUERY =====")
+        print("\n===== NEW QUERY =====")
         file_name = str(input("Filename: "))
         if file_name in picture_list:
             #img_filepath = os.path.join(picture_folder, file_name)
@@ -90,3 +93,44 @@ if __name__ == '__main__':
             print('Score             :', score)
         else:
             print('Filename not in images folder')
+
+
+def main_2():
+    
+    cat_net_root = os.path.join(os.getcwd(), "CAT_Net")
+    picture_folder = os.getcwd()+'/../val/*.*'
+    print('picture_folder :', picture_folder)
+    files = glob(picture_folder)
+    df = pd.DataFrame(columns=['filename', 'cat_net', 'score','ground_truth', 'time_taken(mins)'])
+    
+    for i, img_filepath in enumerate(files[0:5]):
+        #img_filepath = os.path.join(picture_folder, file)
+        s_time = time.time()
+        file = img_filepath.split('\\')[-1]
+        print(f'\n***** Infer New file file_name : {file} *****')
+        if file[0] == '0':
+            ground_truth = 'SUPPORTS'
+        elif file[0] == '2':
+            ground_truth = 'REFUTES'
+        else: ground_truth = 'NONE'
+
+        pred_bool, score, heatmap = cat_inference(img_filepath, cat_net_root)
+        
+        time_taken = round((time.time() - s_time)/60,2)
+        print('Results :', i, file, pred_bool, score, ground_truth, time_taken)
+        
+        df.loc[i] = file, pred_bool, score, ground_truth, time_taken
+
+    df.to_excel('validate_cat_net_5_10.xlsx')
+    
+if __name__ == '__main__':
+
+    print('Are you infering individual images or groups of images in a folder')
+    ans = int(input("[1] one image, [2] folder of images :"))
+    print(ans)
+    if ans == 1:   
+        main()
+    elif ans == 2:
+        main_2()
+    else:
+        print('Invalid Input. Try again')
