@@ -18,7 +18,7 @@ project under the Master of Technology (Intelligent Systems)
 """
 
 import requests, time, os, re, io, cv2
-import logging, warnings
+import logging, warnings, argparse
 import emoji
 import validators
 import numpy as np
@@ -316,14 +316,6 @@ def configure_logger(chat):
 
 def main():
 
-    chat = 0
-    txt_model, txt_tokenizer = text_model()
-    visualbert_model = vb_model()
-    surebot_logger = configure_logger(chat)
-    custom_fig = Figlet(font='slant')
-    surebot_banner = custom_fig.renderText("SureBoTv2")
-    print('\n')
-    print(surebot_banner + "version 2.0\n")
     picture_folder = '../images'
     print('Picture folder :', picture_folder)
     while True:
@@ -350,7 +342,104 @@ def main():
         e_time = (time.time() - s_time)/60
         print(f'Total time taken : {round(e_time,2)} mins')
 
+def main_2(picture_folder='../test4', output_file='report.xlsx'):
+
+    #chat = 'surebotv2'
+    #print(f'DEVICE Used : {device}')
+    #txt_model, txt_tokenizer = text_model()
+    #visualbert_model = vb_model()
+    #surebot_logger = configure_logger(chat)
+    print('picture_folder :', picture_folder)
+    print('output_file :', output_file)
+    #picture_folder = '../test1'
+    #output_file = 'validation_29_62.xlsx'
+    files = glob(picture_folder+'/*.jpg')
+    print('image files to verify :', files)
+    df = pd.DataFrame(columns=['filename', 'rev_img', 'vis_bert', 'text_cls',
+                               'final_result', 'ground_truth', 'eval_res', 'time_taken(min)'])
+    
+    for i, img_filepath in enumerate(files):
+        #img_filepath = os.path.join(picture_folder, file)
+        s_time = time.time()
+        file = img_filepath.split('\\')[1]
+        print(f'\n=============== QUERY NO : {i+1} ===============')
+        print('Image file queried :', file)
+        if file[0] == '0':
+            ground_truth = 'SUPPORTS'
+        elif file[0] == '2':
+            ground_truth = 'REFUTES'
+        else: ground_truth = 'NONE'
+        
+        input_claim = detect_text(img_filepath)
+        if input_claim == []:
+            input_claim = '0'
+        if (len(input_claim[0].split()) < 5):
+            input_claim = ''
+        result, vb_result, text_cls = executePipeline(input_claim, img_filepath, 
+                                                      surebot_logger, txt_model, 
+                                                      txt_tokenizer,visualbert_model)
+
+        all_scores = [result, vb_result, text_cls] #, img_doctoring]
+        support, refute = 0, 0
+        for score in all_scores:
+            if "SUPPORTS" in score:
+                support += 1
+            elif "REFUTES" in score:
+                refute += 1
+        if support > refute:
+            final_score = 'SUPPORTS'
+        elif support < refute:
+            final_score = 'REFUTES' 
+        else:      
+            final_score = "CANNOT BE DETERMINED"
+
+        if final_score == "CANNOT BE DETERMINED":
+            eval_res = ''
+        elif final_score == ground_truth:
+            eval_res = 'CORRECT'
+        else: eval_res = 'WRONG'
+        
+        e_time  = round((time.time() - s_time)/60,2)
+        print(f'Total time taken : {e_time} mins')
+
+        df.loc[i] = file, result, vb_result, text_cls, final_score, ground_truth, eval_res, e_time
+
+    correct = df[df['eval_res'] == 'CORRECT']['eval_res'].value_counts()
+    wrong   = df[df['eval_res'] == 'WRONG']['eval_res'].value_counts()
+
+    df.to_excel(os.path.join(picture_folder, output_file))
+    print(df)
+    return df, correct, wrong
+
 
 if __name__ == "__main__":
 
-    main()
+    chat = 'surebotv2'
+    txt_model, txt_tokenizer = text_model()
+    visualbert_model = vb_model()
+    surebot_logger = configure_logger(chat)
+    custom_fig = Figlet(font='slant')
+    surebot_banner = custom_fig.renderText("SureBoTv2")
+    print('\n')
+    print(surebot_banner + "version 2.0\n")
+    print('*************************************************')
+    print('************  SureBoTv2 Inferencing  ************')
+    print('*************************************************') 
+    print('Inference by individual image <1> or batch of images in a folder <2>')
+    while True:
+        mode = str(input("Mode <1 or 2, Q to exit> : "))
+        if mode == '1':
+            main()
+        elif mode == '2':
+            picture_folder = str(input("Enter Picture folder name <default : '../test4' : "))
+            if picture_folder == '': picture_folder = '../text4'
+            output_file = str(input("Enter output file name    <default : 'report.xlsx' : ")) 
+            if output_file == '': output_file = 'report.xlsx'      
+            main_2(picture_folder, output_file)
+            #main_2()
+        elif mode.upper() == 'Q':
+            break
+        else:
+            print('Wrong input, please try again')
+    
+
