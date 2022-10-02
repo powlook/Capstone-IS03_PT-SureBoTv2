@@ -25,8 +25,7 @@ data
 *.xlsx
 .ipynb
 .sh
-key/*.*
-CAT_Net/output
+#CAT_Net/output
 CAT_Net/input
 CAT_Net/output_pred
-Code/key/*.*
+

@@ -320,7 +320,8 @@ def main():
     print('Picture folder :', picture_folder)
     while True:
         print(f'\n=============== NEW QUERY ===============')
-        file_name = str(input("Filename: "))
+        file_name = str(input(" Input Filename, <Q tp Quit> : "))
+        if file_name.upper() == 'Q': break
         img_filepath = os.path.join(picture_folder, file_name)
         img = cv2.imread(img_filepath, cv2.IMREAD_ANYCOLOR)
         cv2.imshow('Picture', img)
@@ -340,7 +341,7 @@ def main():
         print('Visual Bert Comparison Results :', vb_result)
         print('Text Classification Results :', text_cls)
         e_time = (time.time() - s_time)/60
-        print(f'Total time taken : {round(e_time,2)} mins')
+        print(f'Total time taken : {round(e_time,2)} mins\n')
 
 def main_2(picture_folder='../test4', output_file='report.xlsx'):
 
@@ -400,7 +401,7 @@ def main_2(picture_folder='../test4', output_file='report.xlsx'):
         else: eval_res = 'WRONG'
         
         e_time  = round((time.time() - s_time)/60,2)
-        print(f'Total time taken : {e_time} mins')
+        print(f'\nTotal time taken : {e_time} mins')
 
         df.loc[i] = file, result, vb_result, text_cls, final_score, ground_truth, eval_res, e_time
 
