@@ -26,6 +26,7 @@ data
 .ipynb
 .sh
 #CAT_Net/output
-CAT_Net/input
-CAT_Net/output_pred
+Code/CAT_Net/input
+Code/CAT_Net/output_pred
+Code/key
 
